@@ -1,3 +1,9 @@
+// ============================================================================
+// BLOG CONFIGURATION
+// ============================================================================
+// Configure your blog categories and authors here
+// ============================================================================
+
 export const BLOG_CATEGORIES: {
   title: string;
   slug: "news" | "education";
@@ -6,12 +12,12 @@ export const BLOG_CATEGORIES: {
   {
     title: "News",
     slug: "news",
-    description: "Updates and announcements from Next Template.",
+    description: "Updates and announcements.",
   },
   {
     title: "Education",
     slug: "education",
-    description: "Educational content about template management.",
+    description: "Educational content and tutorials.",
   },
 ];
 

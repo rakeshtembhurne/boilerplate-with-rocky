@@ -1,27 +1,18 @@
 ---
 title: Installation
-description: How to install the project.
+description: How to install and set up the project.
 ---
 
 <Steps>
 
-### Create project
+### Clone or Download
 
-Start by creating a new Next.js project using `create-next-app`:
+Clone the repository or download it:
 
 ```bash
-npx create-next-app my-next-project --example "https://github.com/mickasmt/next-auth-roles-template"
+git clone https://github.com/yourusername/your-repo.git my-project
+cd my-project
 ```
-
-Or deploy with Vercel :
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmickasmt%2Fnext-auth-roles-template)
-
-<Callout type="warning" twClass="mt-4">
-  A good way to create your repository, but the deployment will fail because you
-  need to add your environment variables locally in your project. Follow the
-  documentation for that.
-</Callout>
 
 ### Install dependencies
 
@@ -79,8 +70,20 @@ pnpm run remove-content --blog
 pnpm run remove-content --docs
 ```
 
-### Configuration part
+### Configure Your Site
 
-Let's check the configuration part for update all environment variables before use `pnpm run dev`.
+Edit the configuration files in the `config/` directory:
+
+- `config/site.ts` - Site name, description, social links
+- `config/blog.ts` - Blog authors and categories
+- `config/dashboard.ts` - Dashboard navigation
+
+### Start Development
+
+```bash
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 </Steps>

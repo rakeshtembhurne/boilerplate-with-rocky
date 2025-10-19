@@ -11,15 +11,15 @@ import "@/styles/mdx.css";
 
 import { Metadata } from "next";
 
-import { constructMetadata, getBlurDataURL } from "@/lib/utils";
+import { constructMetadata } from "@/lib/utils";
 
 interface DocPageProps {
-  params: {
+  params: Promise<{
     slug: string[];
-  };
+  }>;
 }
 
-async function getDocFromParams(params) {
+async function getDocFromParams(params: { slug: string[] }) {
   const slug = params.slug?.join("/") || "";
   const doc = allDocs.find((doc) => doc.slugAsParams === slug);
 
@@ -31,7 +31,8 @@ async function getDocFromParams(params) {
 export async function generateMetadata({
   params,
 }: DocPageProps): Promise<Metadata> {
-  const doc = await getDocFromParams(params);
+  const resolvedParams = await params;
+  const doc = await getDocFromParams(resolvedParams);
 
   if (!doc) return {};
 
@@ -43,16 +44,15 @@ export async function generateMetadata({
   });
 }
 
-export async function generateStaticParams(): Promise<
-  DocPageProps["params"][]
-> {
+export async function generateStaticParams() {
   return allDocs.map((doc) => ({
     slug: doc.slugAsParams.split("/"),
   }));
 }
 
 export default async function DocPage({ params }: DocPageProps) {
-  const doc = await getDocFromParams(params);
+  const resolvedParams = await params;
+  const doc = await getDocFromParams(resolvedParams);
 
   if (!doc) {
     notFound();
@@ -60,14 +60,10 @@ export default async function DocPage({ params }: DocPageProps) {
 
   const toc = await getTableOfContents(doc.body.raw);
 
-  const [images] = await Promise.all([
-    await Promise.all(
-      doc.images.map(async (src: string) => ({
-        src,
-        blurDataURL: await getBlurDataURL(src),
-      })),
-    ),
-  ]);
+  const images = doc.images.map((src: string) => ({
+    src,
+    blurDataURL: null,
+  }));
 
   return (
     <main className="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">

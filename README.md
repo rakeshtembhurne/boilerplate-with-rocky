@@ -1,144 +1,221 @@
-<a href="https://next-auth-roles-template.vercel.app">
-  <img alt="Next Template" src="public/_static/og.jpg">
-  <h1 align="center">Next Auth Roles Template</h1>
-</a>
+# AI with Rocky - Next.js Starter
 
-<p align="center">
-  Start at full speed with this Next.js Template !
-</p>
+A modern, production-ready AI starter built with Next.js 15, featuring authentication, role-based authorization, and content management.
 
-<p align="center">
-  <a href="https://twitter.com/miickasmt">
-    <img src="https://img.shields.io/twitter/follow/miickasmt?style=flat&label=miickasmt&logo=twitter&color=0bf&logoColor=fff" alt="Mickasmt Twitter follower count" />
-  </a>
-</p>
+## Features
 
-<p align="center">
-  <a href="#installation"><strong>Installation</strong></a> ·
-  <a href="#tech-stack--features"><strong>Tech Stack + Features</strong></a> ·
-  <a href="#author"><strong>Author</strong></a>
-</p>
-<br/>
+- ⚡ **Next.js 15** with App Router
+- 🔐 **Auth.js v5** with role-based access control (ADMIN/USER)
+- 📝 **MDX Content** for blog and documentation
+- 🎨 **shadcn/ui** components + Tailwind CSS
+- 🗄️ **Prisma** ORM with PostgreSQL
+- 📧 **React Email** + Resend for transactional emails
+- ⚙️ **Fully Configurable** - Everything in `config/` folder
 
-## Installation
+## Known Issues
 
-Clone & create this repo locally with the following command:
+### Next.js 15 + React 19 Development Mode Error
 
+**Issue**: React 19.2.0 has a known bug in development mode causing errors:
+- `Cannot read properties of undefined (reading 'A')`
+- `Cannot read properties of undefined (reading 'recentlyCreatedOwnerStacks')`
+
+**Why**: Next.js 15.5.6 requires React 19, but React 19.2.0 has development mode bugs.
+
+**Impact**:
+- ⚠️ Development server (`pnpm dev`) shows errors on blog/docs pages
+- ✅ Production builds (`pnpm build && pnpm start`) work **perfectly**
+
+**Workaround**: For testing without errors:
 ```bash
-npx create-next-app my-saas-project --example "https://github.com/mickasmt/next-auth-roles-template"
+pnpm build
+pnpm start
 ```
 
-Or, deploy with Vercel:
+**Note**: This is a known React 19 issue. The framework is production-ready despite the dev mode warnings.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmickasmt%2Fnext-auth-roles-template)
+---
 
-### Steps
+## Quick Start
 
-1. Install dependencies using pnpm:
+### 1. Install Dependencies
 
-```sh
+```bash
 pnpm install
 ```
 
-2. Copy `.env.example` to `.env.local` and update the variables.
+### 2. Configure Environment
 
-```sh
+Copy `.env.example` to `.env.local` and fill in your values:
+
+```bash
 cp .env.example .env.local
 ```
 
-3. Start the development server:
+Required variables:
+- `NEXT_PUBLIC_APP_URL` - Your app URL
+- `AUTH_SECRET` - Generate with `openssl rand -base64 32`
+- `DATABASE_URL` - PostgreSQL connection string
+- `GOOGLE_CLIENT_ID` & `GOOGLE_CLIENT_SECRET` - OAuth credentials
+- `RESEND_API_KEY` - Email service API key
 
-```sh
-pnpm run dev
+### 3. Configure Your Site
+
+Edit `config/site.ts` to customize:
+
+```typescript
+export const siteConfig: SiteConfig = {
+  name: "Your Site Name",
+  description: "Your description",
+  url: site_url,
+  links: {
+    twitter: "https://twitter.com/yourhandle",
+    github: "https://github.com/yourusername/yourrepo",
+  },
+  mailSupport: "support@yourdomain.com",
+};
 ```
 
-4. Remove parts you don't want
-
-You can use the command `pnpm run remove-content` in your terminal to remove specific parts of your project. This command supports the following parameters:
-
-- **--blog**: Removes the blog section from your project.
-- **--docs**: Removes the documentation section from your project.
-
-#### Recommendations
-
-- **Remove Both Sections**: It is recommended to use `pnpm run remove-content` without specifying parameters (`--blog` or `--docs`). This ensures that all associated documents are properly removed, as some documents may not be deleted/updated if you remove "blog" after "docs" or vice versa.
-
-#### Examples
-
-1. To remove both the blog and documentation sections:
+### 4. Set Up Database
 
 ```bash
-pnpm run remove-content
+pnpm prisma migrate dev
+pnpm prisma generate
 ```
 
-2. To remove only the blog section:
+### 5. Run Development Server
 
 ```bash
-pnpm run remove-content --blog
+pnpm dev
 ```
 
-3. To remove only the documentation section:
+Open [http://localhost:3000](http://localhost:3000)
+
+## Configuration
+
+All configuration is in the `config/` directory:
+
+- **`config/site.ts`** - Site name, description, social links, support email
+- **`config/dashboard.ts`** - Dashboard sidebar navigation with role-based access
+- **`config/blog.ts`** - Blog categories and authors
+- **`config/docs.ts`** - Documentation structure
+- **`config/marketing.ts`** - Marketing pages navigation
+
+Simply edit these files to customize your site!
+
+## Project Structure
+
+```
+├── app/                    # Next.js App Router
+│   ├── (marketing)/        # Public pages
+│   ├── (protected)/        # Protected routes (dashboard, admin)
+│   ├── (docs)/            # Documentation pages
+│   └── api/               # API routes
+├── components/            # React components
+│   ├── ui/               # shadcn/ui components
+│   ├── dashboard/        # Dashboard components
+│   └── layout/           # Layout components
+├── config/               # ⚙️ CONFIGURATION FILES - Edit these!
+├── content/              # MDX content (blog & docs)
+├── lib/                  # Utilities
+├── prisma/              # Database schema
+└── emails/              # Email templates
+```
+
+## Available Commands
 
 ```bash
-pnpm run remove-content --docs
+# Development
+pnpm dev            # Start dev server
+pnpm turbo          # Start dev with Turbopack (faster)
+
+# Production
+pnpm build          # Build for production
+pnpm start          # Start production server
+
+# Database
+pnpm prisma migrate dev     # Run migrations
+pnpm prisma studio          # Open database GUI
+
+# Other
+pnpm lint                    # Run linter
+pnpm email                   # Email dev server (port 3333)
+pnpm remove-content          # Remove blog/docs
 ```
 
-> [!NOTE]  
-> I use [npm-check-updates](https://www.npmjs.com/package/npm-check-updates) package for update this project.
->
-> Use this command for update your project: `ncu -i --format group`
+## Tech Stack
 
-## Tech Stack + Features
+- **Framework:** Next.js 15.5.6
+- **React:** 19.2.0 (latest)
+- **Language:** TypeScript 5.9
+- **Database:** PostgreSQL with Prisma 6
+- **Auth:** Auth.js v5
+- **UI:** shadcn/ui + Radix UI + Tailwind CSS
+- **Content:** Contentlayer2 (MDX)
+- **Email:** React Email + Resend
 
-<img alt="Next Auth Roles Template" src="public/_static/images/x-preview.jpg">
+## Customization Guide
 
-### Frameworks
+### Adding Blog Posts
 
-- [Next.js](https://nextjs.org/) – React framework for building performant apps with the best developer experience
-- [Auth.js](https://authjs.dev/) – Handle user authentication with ease with providers like Google, Twitter, GitHub, etc.
-- [Prisma](https://www.prisma.io/) – Typescript-first ORM for Node.js
-- [React Email](https://react.email/) – Versatile email framework for efficient and flexible email development
+Create `.mdx` files in `content/blog/`:
 
-### Platforms
+```mdx
+---
+title: "Your Post Title"
+description: "Post description"
+date: "2025-01-15"
+authors:
+  - author
+categories:
+  - news
+---
 
-- [Vercel](https://vercel.com/) – Easily preview & deploy changes with git
-- [Resend](https://resend.com/) – A powerful email framework for streamlined email development
-- [Neon](https://neon.tech/) – Serverless Postgres with autoscaling, branching, bottomless storage and generous free tier.
+Your content here...
+```
 
-### UI
+### Adding Documentation
 
-- [Tailwind CSS](https://tailwindcss.com/) – Utility-first CSS framework for rapid UI development
-- [Shadcn/ui](https://ui.shadcn.com/) – Re-usable components built using Radix UI and Tailwind CSS
-- [Lucide](https://lucide.dev/) – Beautifully simple, pixel-perfect icons
-- [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) – Optimize custom fonts and remove external network requests for improved performance
-- [`ImageResponse`](https://nextjs.org/docs/app/api-reference/functions/image-response) – Generate dynamic Open Graph images at the edge
+Create `.mdx` files in `content/docs/` and update `config/docs.ts` navigation.
 
-### Hooks and Utilities
+### Changing Colors
 
-- `useIntersectionObserver` – React hook to observe when an element enters or leaves the viewport
-- `useLocalStorage` – Persist data in the browser's local storage
-- `useScroll` – React hook to observe scroll position ([example](https://github.com/mickasmt/precedent/blob/main/components/layout/navbar.tsx#L12))
-- `nFormatter` – Format numbers with suffixes like `1.2k` or `1.2M`
-- `capitalize` – Capitalize the first letter of a string
-- `truncate` – Truncate a string to a specified length
-- [`use-debounce`](https://www.npmjs.com/package/use-debounce) – Debounce a function call / state update
+Edit `app/globals.css` to customize your theme colors.
 
-### Code Quality
+### Adding OAuth Providers
 
-- [TypeScript](https://www.typescriptlang.org/) – Static type checker for end-to-end typesafety
-- [Prettier](https://prettier.io/) – Opinionated code formatter for consistent code style
-- [ESLint](https://eslint.org/) – Pluggable linter for Next.js and TypeScript
+1. Add credentials to `.env.local`
+2. Update `auth.config.ts`
 
-### Miscellaneous
+```typescript
+import GitHub from "next-auth/providers/github"
 
-- [Vercel Analytics](https://vercel.com/analytics) – Track unique visitors, pageviews, and more in a privacy-friendly way
+export default {
+  providers: [
+    Google(...),
+    GitHub({
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    }),
+  ],
+}
+```
 
-## Author
+## Deployment
 
-This project is based on [Next SaaS Stripe Starter](https://next-saas-stripe-starter.vercel.app/).
+### Vercel (Recommended)
 
-Created by [@miickasmt](https://twitter.com/miickasmt) in 2023, released under the [MIT license](https://github.com/shadcn/taxonomy/blob/main/LICENSE.md).
+1. Push to GitHub
+2. Import project in Vercel
+3. Add environment variables
+4. Deploy!
 
-## Credits
+Make sure to set all environment variables in your hosting platform.
 
-Thanks to [Hosna Qasmei](https://twitter.com/hqasmei) for part of the dashboard sidebar code.
+## License
+
+MIT
+
+## Support
+
+For issues or questions, check the documentation in `/docs` or open an issue on GitHub.

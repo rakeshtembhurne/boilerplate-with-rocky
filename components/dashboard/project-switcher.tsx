@@ -23,12 +23,12 @@ const projects: ProjectType[] = [
   {
     title: "Project 1",
     slug: "project-number-one",
-    color: "bg-red-500",
+    color: "bg-destructive",
   },
   {
     title: "Project 2",
     slug: "project-number-two",
-    color: "bg-blue-500",
+    color: "bg-primary",
   },
 ];
 const selected: ProjectType = projects[1];
@@ -48,7 +48,7 @@ export default function ProjectSwitcher({
   return (
     <div>
       <Popover open={openPopover} onOpenChange={setOpenPopover}>
-        <PopoverTrigger>
+        <PopoverTrigger asChild>
           <Button
             className="h-8 px-2"
             variant={openPopover ? "secondary" : "ghost"}

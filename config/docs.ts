@@ -1,5 +1,11 @@
 import { DocsConfig } from "types";
 
+// ============================================================================
+// DOCUMENTATION CONFIGURATION
+// ============================================================================
+// Configure your documentation navigation and structure here
+// ============================================================================
+
 export const docsConfig: DocsConfig = {
   mainNav: [
     {

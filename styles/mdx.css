@@ -5,7 +5,6 @@ code[data-theme*=" "] span {
 }
 
 @media (prefers-color-scheme: dark) {
-
   code[data-theme*=" "],
   code[data-theme*=" "] span {
     color: var(--shiki-dark);
@@ -14,21 +13,36 @@ code[data-theme*=" "] span {
 }
 
 [data-rehype-pretty-code-figure] {
-  @apply relative mt-6 mb-4;
+  position: relative;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 [data-rehype-pretty-code-figure] code {
-  @apply grid min-w-full break-words rounded-none border-0 bg-transparent p-0;
+  display: grid;
+  min-width: 100%;
+  overflow-wrap: break-word;
+  border-radius: 0;
+  border-width: 0;
+  background-color: transparent;
+  padding: 0;
   counter-reset: line;
   box-decoration-break: clone;
 }
 
 [data-line] {
-  @apply px-4 min-h-[1rem] py-0.5 w-full inline-block;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  min-height: 1rem;
+  padding-top: 0.125rem;
+  padding-bottom: 0.125rem;
+  width: 100%;
+  display: inline-block;
 }
 
 [data-line-numbers]>[data-line]::before {
-  @apply text-muted-foreground text-xs;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
   counter-increment: line;
   content: counter(line);
   display: inline-block;
@@ -38,25 +52,37 @@ code[data-theme*=" "] span {
 }
 
 [data-highlighted-line] {
-  @apply bg-zinc-600/50;
+  background-color: rgba(63, 63, 70, 0.5);
 }
 
 [data-highlighted-chars] span {
-  @apply relative;
+  position: relative;
 }
 
 [data-highlighted-chars] {
-  @apply rounded-sm bg-zinc-600/50 text-foreground p-1;
+  border-radius: 0.125rem;
+  background-color: rgba(63, 63, 70, 0.5);
+  color: var(--foreground);
+  padding: 0.25rem;
 }
 
 [data-rehype-pretty-code-title] {
-  @apply mt-3 py-2 px-4 text-sm font-medium;
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
 .mdx>.steps:first-child>h3:first-child {
-  @apply mt-0;
+  margin-top: 0;
 }
 
 .steps>h3 {
-  @apply mt-8 mb-4 text-base font-semibold;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
 }

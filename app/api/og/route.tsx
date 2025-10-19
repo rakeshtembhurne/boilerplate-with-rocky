@@ -1,5 +1,6 @@
 import { ImageResponse } from "@vercel/og"
 
+import { siteConfig } from "@/config/site"
 import { ogImageSchema } from "@/lib/validations/og"
 
 export const runtime = "edge"
@@ -30,7 +31,8 @@ export async function GET(req: Request) {
 
     const fontSize = heading.length > 80 ? "60px" : "80px"
 
-    const githubName = "mickasmt";
+    // Extract username from GitHub URL from config
+    const githubName = "@" + siteConfig.links.github.split('/').pop();
 
     return new ImageResponse(
       (
