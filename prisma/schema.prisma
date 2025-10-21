@@ -73,3 +73,29 @@ model VerificationToken {
   @@unique([identifier, token])
   @@map(name: "verification_tokens")
 }
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+model Product {
+  id          String        @id @default(cuid())
+  name        String
+  description String?       @db.Text
+  sku         String?
+  barcode     String?
+  price       Decimal       @db.Decimal(10, 2)
+  discountedPrice Decimal?  @db.Decimal(10, 2)
+  stock       Int           @default(0)
+  category    String?
+  subCategory String?
+  status      ProductStatus @default(DRAFT)
+  inStock     Boolean       @default(true)
+  chargeTax   Boolean       @default(false)
+  createdAt   DateTime      @default(now()) @map(name: "created_at")
+  updatedAt   DateTime      @updatedAt @map(name: "updated_at")
+
+  @@map(name: "products")
+}

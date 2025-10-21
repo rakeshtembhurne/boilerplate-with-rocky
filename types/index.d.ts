@@ -1,7 +1,13 @@
-import { User, UserRole } from "@prisma/client";
+import { User, UserRole, Product as PrismaProduct } from "@prisma/client";
 import type { Icon } from "lucide-react";
 
 import { Icons } from "@/components/shared/icons";
+
+// Serialized Product type for client components (Decimal -> string)
+export type Product = Omit<PrismaProduct, "price" | "discountedPrice"> & {
+  price: string;
+  discountedPrice: string | null;
+};
 
 export type SiteConfig = {
   name: string;
