@@ -97,10 +97,63 @@ export function DateRangePicker({ className }: DateRangePickerProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleQuickSelect = (from: Date, to: Date) => {
+  // Detect current preset based on date range
+  const getCurrentPreset = React.useCallback(() => {
+    if (!dateRange?.from || !dateRange?.to) return "last28Days";
+
+    const from = startOfDay(dateRange.from);
+    const to = endOfDay(dateRange.to);
+    const today = endOfDay(new Date());
+
+    // Check each preset
+    if (format(from, "yyyy-MM-dd") === format(startOfDay(today), "yyyy-MM-dd") &&
+        format(to, "yyyy-MM-dd") === format(today, "yyyy-MM-dd")) {
+      return "today";
+    }
+    if (format(from, "yyyy-MM-dd") === format(startOfDay(subDays(today, 1)), "yyyy-MM-dd") &&
+        format(to, "yyyy-MM-dd") === format(endOfDay(subDays(today, 1)), "yyyy-MM-dd")) {
+      return "yesterday";
+    }
+    if (format(from, "yyyy-MM-dd") === format(startOfDay(startOfWeek(today)), "yyyy-MM-dd") &&
+        format(to, "yyyy-MM-dd") === format(today, "yyyy-MM-dd")) {
+      return "thisWeek";
+    }
+    if (format(from, "yyyy-MM-dd") === format(startOfDay(subDays(today, 6)), "yyyy-MM-dd") &&
+        format(to, "yyyy-MM-dd") === format(today, "yyyy-MM-dd")) {
+      return "last7Days";
+    }
+    if (format(from, "yyyy-MM-dd") === format(startOfDay(subDays(today, 27)), "yyyy-MM-dd") &&
+        format(to, "yyyy-MM-dd") === format(today, "yyyy-MM-dd")) {
+      return "last28Days";
+    }
+    if (format(from, "yyyy-MM-dd") === format(startOfMonth(today), "yyyy-MM-dd") &&
+        format(to, "yyyy-MM-dd") === format(today, "yyyy-MM-dd")) {
+      return "thisMonth";
+    }
+    const lastMonth = subMonths(today, 1);
+    if (format(from, "yyyy-MM-dd") === format(startOfMonth(lastMonth), "yyyy-MM-dd") &&
+        format(to, "yyyy-MM-dd") === format(endOfMonth(lastMonth), "yyyy-MM-dd")) {
+      return "lastMonth";
+    }
+    if (format(from, "yyyy-MM-dd") === format(startOfDay(startOfYear(today)), "yyyy-MM-dd") &&
+        format(to, "yyyy-MM-dd") === format(today, "yyyy-MM-dd")) {
+      return "thisYear";
+    }
+
+    return ""; // Custom range
+  }, [dateRange]);
+
+  const [selectedPreset, setSelectedPreset] = React.useState(getCurrentPreset());
+
+  React.useEffect(() => {
+    setSelectedPreset(getCurrentPreset());
+  }, [dateRange, getCurrentPreset]);
+
+  const handleQuickSelect = (from: Date, to: Date, preset: string) => {
     const newDateRange = { from, to };
     setDateRange(newDateRange);
     setCurrentMonth(from);
+    setSelectedPreset(preset);
     updateURLWithDate(from, to);
   };
 
@@ -109,34 +162,34 @@ export function DateRangePicker({ className }: DateRangePickerProps) {
 
     switch (type) {
       case "today":
-        handleQuickSelect(startOfDay(today), endOfDay(today));
+        handleQuickSelect(startOfDay(today), endOfDay(today), type);
         break;
       case "yesterday":
         const yesterday = subDays(today, 1);
-        handleQuickSelect(startOfDay(yesterday), endOfDay(yesterday));
+        handleQuickSelect(startOfDay(yesterday), endOfDay(yesterday), type);
         break;
       case "thisWeek":
         const startOfCurrentWeek = startOfWeek(today);
-        handleQuickSelect(startOfDay(startOfCurrentWeek), endOfDay(today));
+        handleQuickSelect(startOfDay(startOfCurrentWeek), endOfDay(today), type);
         break;
       case "last7Days":
         const sevenDaysAgo = subDays(today, 6);
-        handleQuickSelect(startOfDay(sevenDaysAgo), endOfDay(today));
+        handleQuickSelect(startOfDay(sevenDaysAgo), endOfDay(today), type);
         break;
       case "last28Days":
         const twentyEightDaysAgo = subDays(today, 27);
-        handleQuickSelect(startOfDay(twentyEightDaysAgo), endOfDay(today));
+        handleQuickSelect(startOfDay(twentyEightDaysAgo), endOfDay(today), type);
         break;
       case "thisMonth":
-        handleQuickSelect(startOfMonth(today), endOfDay(today));
+        handleQuickSelect(startOfMonth(today), endOfDay(today), type);
         break;
       case "lastMonth":
         const lastMonth = subMonths(today, 1);
-        handleQuickSelect(startOfMonth(lastMonth), endOfMonth(lastMonth));
+        handleQuickSelect(startOfMonth(lastMonth), endOfMonth(lastMonth), type);
         break;
       case "thisYear":
         const startOfCurrentYear = startOfYear(today);
-        handleQuickSelect(startOfDay(startOfCurrentYear), endOfDay(today));
+        handleQuickSelect(startOfDay(startOfCurrentYear), endOfDay(today), type);
         break;
     }
   };
@@ -170,9 +223,9 @@ export function DateRangePicker({ className }: DateRangePickerProps) {
         <PopoverContent className="w-auto p-0" align="end">
           <div className="flex flex-col lg:flex-row">
             <div className="border-b p-3 lg:border-b-0 lg:border-r">
-              <Select defaultValue="last28Days" onValueChange={(value) => changeHandle(value)}>
+              <Select value={selectedPreset} onValueChange={(value) => changeHandle(value)}>
                 <SelectTrigger className="w-full lg:hidden" aria-label="Select a value">
-                  <SelectValue placeholder="Last 28 Days" />
+                  <SelectValue placeholder="Select range" />
                 </SelectTrigger>
                 <SelectContent>
                   {dateFilterPresets.map((item, key) => (
@@ -184,7 +237,7 @@ export function DateRangePicker({ className }: DateRangePickerProps) {
               </Select>
               <ToggleGroup
                 type="single"
-                defaultValue="last28Days"
+                value={selectedPreset}
                 className="hidden w-32 flex-col items-start lg:flex"
               >
                 {dateFilterPresets.map((item, key) => (

@@ -216,6 +216,107 @@ Make sure to set all environment variables in your hosting platform.
 
 MIT
 
+## Products Module - Plugin Architecture
+
+This project includes a self-contained products module demonstrating plugin-style architecture.
+
+### Module Structure
+
+```
+app/(protected)/products/
+├── _components/          # UI components (underscore = private)
+│   ├── product-form.tsx
+│   └── product-list.tsx
+├── _lib/                 # Business logic & utilities
+│   ├── api-client.ts    # REST API client
+│   ├── api-response.ts  # OpenAPI response utilities
+│   ├── cache.ts         # In-memory caching (5min TTL)
+│   └── server-api.ts    # Server-side data fetching
+├── _types/              # TypeScript definitions
+├── _validations/        # Zod schemas
+├── [id]/edit/          # Dynamic routes
+├── create/             # Static routes
+└── page.tsx            # Main list page
+```
+
+### REST API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/products` | List products (paginated, filterable) |
+| POST | `/api/products` | Create product |
+| GET | `/api/products/[id]` | Get single product |
+| PUT | `/api/products/[id]` | Update product |
+| DELETE | `/api/products/[id]` | Delete product |
+| GET | `/api/products/filters` | Get filter options (cached 5min) |
+
+### OpenAPI Response Format
+
+**Success Response:**
+```json
+{
+  "success": true,
+  "data": { ... },
+  "message": "Operation successful",
+  "meta": {
+    "page": 1,
+    "pageSize": 10,
+    "total": 100,
+    "totalPages": 10
+  }
+}
+```
+
+**Error Response:**
+```json
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Validation failed",
+    "details": { ... }
+  }
+}
+```
+
+### TypeScript Path Alias
+
+Import from products module using `@/products/*`:
+
+```typescript
+import { Product } from "@/products/_types";
+import { getProducts } from "@/products/_lib/api-client";
+
+// Fetch products
+const { products, pagination } = await getProducts({
+  page: 1,
+  search: "laptop",
+  categories: ["Electronics"],
+  statuses: ["ACTIVE"]
+});
+```
+
+### Key Features
+
+1. **Self-Contained**: All code in one folder
+2. **REST APIs**: OpenAPI-standard responses with proper error codes
+3. **Database Filters**: Categories and statuses fetched dynamically from DB
+4. **Caching**: 5-minute in-memory cache for filter data
+5. **Type-Safe**: Full TypeScript support with path aliases
+6. **Reusable Pattern**: Copy folder structure for new features
+
+### Creating New Modules
+
+To create similar modules (orders, customers, etc):
+
+1. Copy the products folder structure
+2. Add TypeScript alias in `tsconfig.json`:
+   ```json
+   "@/orders/*": ["./app/(protected)/orders/*"]
+   ```
+3. Create API routes in `app/api/orders/`
+4. Update navigation in `config/dashboard.ts`
+
 ## Support
 
 For issues or questions, check the documentation in `/docs` or open an issue on GitHub.
