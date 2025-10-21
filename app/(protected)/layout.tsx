@@ -1,15 +1,10 @@
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 
-import { sidebarLinks } from "@/config/dashboard";
 import { getCurrentUser } from "@/lib/session";
-import { SearchCommand } from "@/components/dashboard/search-command";
-import {
-  DashboardSidebar,
-  MobileSheetSidebar,
-} from "@/components/layout/dashboard-sidebar";
-import { ModeToggle } from "@/components/layout/mode-toggle";
-import { UserAccountNav } from "@/components/layout/user-account-nav";
-import MaxWidthWrapper from "@/components/shared/max-width-wrapper";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/layout/sidebar/app-sidebar";
+import { SiteHeader } from "@/components/layout/header";
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
@@ -20,37 +15,29 @@ export default async function Dashboard({ children }: ProtectedLayoutProps) {
 
   if (!user) redirect("/login");
 
-  const filteredLinks = sidebarLinks.map((section) => ({
-    ...section,
-    items: section.items.filter(
-      ({ authorizeOnly }) => !authorizeOnly || authorizeOnly === user.role,
-    ),
-  }));
+  const cookieStore = await cookies();
+  const defaultOpen =
+    cookieStore.get("sidebar_state")?.value === "true" ||
+    cookieStore.get("sidebar_state") === undefined;
 
   return (
-    <div className="relative flex min-h-screen w-full">
-      <DashboardSidebar links={filteredLinks} />
-
-      <div className="flex flex-1 flex-col">
-        <header className="sticky top-0 z-50 flex h-14 bg-background px-4 lg:h-[60px] xl:px-8">
-          <MaxWidthWrapper className="flex max-w-7xl items-center gap-x-3 px-0">
-            <MobileSheetSidebar links={filteredLinks} />
-
-            <div className="w-full flex-1">
-              <SearchCommand links={filteredLinks} />
-            </div>
-
-            <ModeToggle />
-            <UserAccountNav />
-          </MaxWidthWrapper>
-        </header>
-
-        <main className="flex-1 p-4 xl:px-8">
-          <MaxWidthWrapper className="flex h-full max-w-7xl flex-col gap-4 px-0 lg:gap-6">
+    <SidebarProvider
+      defaultOpen={defaultOpen}
+      style={
+        {
+          "--sidebar-width": "calc(var(--spacing) * 64)",
+          "--header-height": "calc(var(--spacing) * 14)"
+        } as React.CSSProperties
+      }>
+      <AppSidebar variant="inset" />
+      <SidebarInset>
+        <SiteHeader />
+        <div className="flex flex-1 flex-col">
+          <div className="@container/main p-4 xl:group-data-[theme-content-layout=centered]/layout:container xl:group-data-[theme-content-layout=centered]/layout:mx-auto">
             {children}
-          </MaxWidthWrapper>
-        </main>
-      </div>
-    </div>
+          </div>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

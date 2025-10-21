@@ -10,36 +10,36 @@ This is a Next.js 15 AI starter boilerplate with user authentication, role-based
 
 ```bash
 # Install dependencies
-pnpm install
+npm install
 
 # Development server
-pnpm run dev
+npm run dev
 
 # Development with Turbopack (faster)
-pnpm run turbo
+npm run turbo
 
 # Build production
-pnpm build
+npm run build
 
 # Start production server
-pnpm start
+npm start
 
 # Linting
-pnpm run lint
+npm run lint
 
 # Preview production build locally
-pnpm run preview
+npm run preview
 
 # Generate Prisma client
-pnpm run postinstall
+npm run postinstall
 
 # Email development server (React Email)
-pnpm run email
+npm run email
 
 # Remove blog/docs sections
-pnpm run remove-content
-pnpm run remove-content --blog
-pnpm run remove-content --docs
+npm run remove-content
+npm run remove-content --blog
+npm run remove-content --docs
 ```
 
 ## Project Architecture

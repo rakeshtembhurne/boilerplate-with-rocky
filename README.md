@@ -23,13 +23,13 @@ A modern, production-ready AI starter built with Next.js 15, featuring authentic
 **Why**: Next.js 15.5.6 requires React 19, but React 19.2.0 has development mode bugs.
 
 **Impact**:
-- ⚠️ Development server (`pnpm dev`) shows errors on blog/docs pages
-- ✅ Production builds (`pnpm build && pnpm start`) work **perfectly**
+- ⚠️ Development server (`npm run dev`) shows errors on blog/docs pages
+- ✅ Production builds (`npm run build && npm start`) work **perfectly**
 
 **Workaround**: For testing without errors:
 ```bash
-pnpm build
-pnpm start
+npm run build
+npm start
 ```
 
 **Note**: This is a known React 19 issue. The framework is production-ready despite the dev mode warnings.
@@ -41,7 +41,7 @@ pnpm start
 ### 1. Install Dependencies
 
 ```bash
-pnpm install
+npm install
 ```
 
 ### 2. Configure Environment
@@ -79,14 +79,14 @@ export const siteConfig: SiteConfig = {
 ### 4. Set Up Database
 
 ```bash
-pnpm prisma migrate dev
-pnpm prisma generate
+npx prisma migrate dev
+npx prisma generate
 ```
 
 ### 5. Run Development Server
 
 ```bash
-pnpm dev
+npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000)
@@ -126,21 +126,21 @@ Simply edit these files to customize your site!
 
 ```bash
 # Development
-pnpm dev            # Start dev server
-pnpm turbo          # Start dev with Turbopack (faster)
+npm run dev            # Start dev server
+npm run turbo          # Start dev with Turbopack (faster)
 
 # Production
-pnpm build          # Build for production
-pnpm start          # Start production server
+npm run build          # Build for production
+npm start              # Start production server
 
 # Database
-pnpm prisma migrate dev     # Run migrations
-pnpm prisma studio          # Open database GUI
+npx prisma migrate dev     # Run migrations
+npx prisma studio          # Open database GUI
 
 # Other
-pnpm lint                    # Run linter
-pnpm email                   # Email dev server (port 3333)
-pnpm remove-content          # Remove blog/docs
+npm run lint               # Run linter
+npm run email              # Email dev server (port 3333)
+npm run remove-content     # Remove blog/docs
 ```
 
 ## Tech Stack
