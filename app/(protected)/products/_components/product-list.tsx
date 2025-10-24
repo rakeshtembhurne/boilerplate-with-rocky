@@ -8,6 +8,7 @@ import {
   ChevronRight,
   PlusCircle,
   FilterIcon,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -48,8 +49,8 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { deleteProduct } from "@/actions/product";
-import type { Product } from "types";
+import { deleteProduct, getProductFilters, type ProductFilters } from "../_lib/api-client";
+import type { Product } from "../_types";
 
 interface PaginationData {
   total: number;
@@ -63,36 +64,17 @@ interface ProductListProps {
   pagination: PaginationData;
 }
 
-const categories = [
-  "Electronics",
-  "Clothing",
-  "Accessories",
-  "Beauty",
-  "Technology",
-  "Food",
-  "Home Appliances",
-  "Sports",
-  "Books",
-  "Toys",
-];
-
-const statuses = [
-  { value: "ACTIVE", label: "Active" },
-  { value: "DRAFT", label: "Draft" },
-  { value: "ARCHIVED", label: "Archived" },
-];
-
 function ProductActions({ product }: { product: Product }) {
   const router = useRouter();
 
   const handleDelete = async () => {
     if (confirm("Are you sure you want to delete this product?")) {
-      const result = await deleteProduct(product.id);
-      if (result.status === "success") {
+      try {
+        await deleteProduct(product.id);
         toast.success("Product deleted successfully");
         router.refresh();
-      } else {
-        toast.error("Failed to delete product");
+      } catch (error: any) {
+        toast.error(error.message || "Failed to delete product");
       }
     }
   };
@@ -115,7 +97,7 @@ function ProductActions({ product }: { product: Product }) {
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <Link
-            href={`/dashboard/products/${product.id}/edit`}
+            href={`/products/${product.id}/edit`}
             className="w-full"
           >
             Edit
@@ -132,6 +114,24 @@ function ProductActions({ product }: { product: Product }) {
 export default function ProductList({ data, pagination }: ProductListProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Fetch filters from database
+  const [filters, setFilters] = React.useState<ProductFilters>({ categories: [], statuses: [] });
+  const [filtersLoaded, setFiltersLoaded] = React.useState(false);
+
+  React.useEffect(() => {
+    async function loadFilters() {
+      try {
+        const fetchedFilters = await getProductFilters();
+        setFilters(fetchedFilters);
+        setFiltersLoaded(true);
+      } catch (error) {
+        console.error("Failed to load filters:", error);
+        toast.error("Failed to load filters");
+      }
+    }
+    loadFilters();
+  }, []);
 
   // Get initial values from URL
   const urlCategories = searchParams.get("categories")?.split(",").filter(Boolean) || undefined;
@@ -187,7 +187,7 @@ export default function ProductList({ data, pagination }: ProductListProps) {
     (value: string) => {
       setSearchValue(value);
       const query = createQueryString({ search: value, page: 1 });
-      router.push(`/dashboard/products?${query}`);
+      router.push(`/products?${query}`);
     },
     [createQueryString, router]
   );
@@ -195,7 +195,7 @@ export default function ProductList({ data, pagination }: ProductListProps) {
   const handlePageChange = React.useCallback(
     (newPage: number) => {
       const query = createQueryString({ page: newPage });
-      router.push(`/dashboard/products?${query}`);
+      router.push(`/products?${query}`);
     },
     [createQueryString, router]
   );
@@ -210,7 +210,7 @@ export default function ProductList({ data, pagination }: ProductListProps) {
         newSearchParams.delete("categories");
       }
       newSearchParams.set("page", "1");
-      router.push(`/dashboard/products?${newSearchParams.toString()}`);
+      router.push(`/products?${newSearchParams.toString()}`);
     },
     [router, searchParams, setSelectedCategories]
   );
@@ -225,7 +225,7 @@ export default function ProductList({ data, pagination }: ProductListProps) {
         newSearchParams.delete("statuses");
       }
       newSearchParams.set("page", "1");
-      router.push(`/dashboard/products?${newSearchParams.toString()}`);
+      router.push(`/products?${newSearchParams.toString()}`);
     },
     [router, searchParams, setSelectedStatuses]
   );
@@ -253,7 +253,7 @@ export default function ProductList({ data, pagination }: ProductListProps) {
         newSearchParams.set("statuses", selectedStatuses.join(","));
       }
 
-      router.replace(`/dashboard/products?${newSearchParams.toString()}`);
+      router.replace(`/products?${newSearchParams.toString()}`);
       hasSyncedRef.current = true;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -286,7 +286,7 @@ export default function ProductList({ data, pagination }: ProductListProps) {
               <CommandList>
                 <CommandEmpty>No status found.</CommandEmpty>
                 <CommandGroup>
-                  {statuses.map((status) => (
+                  {filters.statuses.map((status) => (
                     <CommandItem key={status.value} value={status.value}>
                       <div className="flex items-center space-x-3 py-1">
                         <Checkbox
@@ -326,7 +326,7 @@ export default function ProductList({ data, pagination }: ProductListProps) {
               <CommandList>
                 <CommandEmpty>No category found.</CommandEmpty>
                 <CommandGroup>
-                  {categories.map((category) => (
+                  {filters.categories.map((category) => (
                     <CommandItem key={category} value={category}>
                       <div className="flex items-center space-x-3 py-1">
                         <Checkbox
@@ -357,8 +357,74 @@ export default function ProductList({ data, pagination }: ProductListProps) {
     );
   };
 
+  // Active filters
+  const hasDateFilter = searchParams.get("dateFrom") && searchParams.get("dateTo");
+  const activeFiltersCount = selectedCategories.length + selectedStatuses.length + (searchValue ? 1 : 0) + (hasDateFilter ? 1 : 0);
+
+  const handleClearFilters = () => {
+    // Clear page-specific filters
+    setSelectedCategories([]);
+    setSelectedStatuses([]);
+    setSearchValue("");
+
+    // Clear date range from localStorage (global filter)
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("global-filter-date-range");
+    }
+
+    // Navigate to clean URL (this will clear all URL params including dateFrom/dateTo)
+    router.push("/products");
+  };
+
   return (
     <div className="w-full space-y-4">
+      {/* Active Filters Display */}
+      {(activeFiltersCount > 0 || hasDateFilter) && (
+        <div className="flex items-center gap-2 flex-wrap bg-muted/30 border-2 border-muted p-3 rounded-lg shadow-sm">
+          <strong className="text-sm font-bold">Active filters:</strong>
+
+          {searchValue && (
+            <div className="inline-flex items-center gap-1 bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-md text-sm">
+              <span className="text-muted-foreground">Search:</span>
+              <span className="font-semibold text-primary">{searchValue}</span>
+            </div>
+          )}
+
+          {selectedCategories.map((cat) => (
+            <div key={cat} className="inline-flex items-center gap-1 bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-md text-sm">
+              <span className="text-muted-foreground">Category:</span>
+              <span className="font-semibold text-primary">{cat}</span>
+            </div>
+          ))}
+
+          {selectedStatuses.map((status) => (
+            <div key={status} className="inline-flex items-center gap-1 bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-md text-sm">
+              <span className="text-muted-foreground">Status:</span>
+              <span className="font-semibold text-primary capitalize">{status.toLowerCase()}</span>
+            </div>
+          ))}
+
+          {hasDateFilter && (
+            <div className="inline-flex items-center gap-1 bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-md text-sm">
+              <span className="text-muted-foreground">Date range:</span>
+              <span className="font-semibold text-primary">
+                {new Date(searchParams.get("dateFrom")!).toLocaleDateString()} - {new Date(searchParams.get("dateTo")!).toLocaleDateString()}
+              </span>
+            </div>
+          )}
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleClearFilters}
+            className="ml-auto h-7 px-2.5 text-xs border-destructive text-destructive hover:bg-destructive hover:text-white"
+          >
+            <X className="mr-1 h-3 w-3" />
+            Clear filters
+          </Button>
+        </div>
+      )}
+
       <div className="flex items-center gap-4">
         <div className="flex flex-1 gap-2">
           <Input

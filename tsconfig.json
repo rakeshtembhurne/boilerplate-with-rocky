@@ -17,6 +17,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
+      "@/products/*": ["./app/(protected)/products/*"],
       "contentlayer/generated": ["./.contentlayer/generated"]
     },
     "plugins": [

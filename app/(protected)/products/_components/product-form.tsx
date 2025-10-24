@@ -37,9 +37,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { productSchema, ProductFormData } from "@/lib/validations/product";
-import { createProduct, updateProduct } from "@/actions/product";
-import type { Product } from "types";
+import { productSchema, ProductFormData } from "../_validations/product";
+import { createProduct, updateProduct, getProductFilters, type ProductFilters } from "../_lib/api-client";
+import type { Product } from "../_types";
+import { useEffect } from "react";
 
 interface ProductFormProps {
   product?: Product;
@@ -49,6 +50,21 @@ interface ProductFormProps {
 export default function ProductForm({ product, isEdit = false }: ProductFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [filters, setFilters] = useState<ProductFilters>({ categories: [], statuses: [] });
+
+  // Load filters from database
+  useEffect(() => {
+    async function loadFilters() {
+      try {
+        const fetchedFilters = await getProductFilters();
+        setFilters(fetchedFilters);
+      } catch (error) {
+        console.error("Failed to load filters:", error);
+        toast.error("Failed to load categories");
+      }
+    }
+    loadFilters();
+  }, []);
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -71,21 +87,17 @@ export default function ProductForm({ product, isEdit = false }: ProductFormProp
   async function onSubmit(data: ProductFormData) {
     setIsLoading(true);
     try {
-      const result = isEdit && product
-        ? await updateProduct(product.id, data)
-        : await createProduct(data);
-
-      if (result.status === "success") {
-        toast.success(
-          isEdit ? "Product updated successfully" : "Product created successfully"
-        );
-        router.push("/dashboard/products");
-        router.refresh();
+      if (isEdit && product) {
+        await updateProduct(product.id, data);
+        toast.success("Product updated successfully");
       } else {
-        toast.error(result.message || "Something went wrong");
+        await createProduct(data);
+        toast.success("Product created successfully");
       }
-    } catch (error) {
-      toast.error("Something went wrong");
+      router.push("/products");
+      router.refresh();
+    } catch (error: any) {
+      toast.error(error.message || "Something went wrong");
     } finally {
       setIsLoading(false);
     }
@@ -96,7 +108,7 @@ export default function ProductForm({ product, isEdit = false }: ProductFormProp
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <div className="mb-4 flex flex-col justify-between space-y-4 lg:flex-row lg:items-center lg:space-y-2">
           <div className="flex items-center gap-4">
-            <Link href="/dashboard/products">
+            <Link href="/products">
               <Button variant="outline" size="icon">
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -109,7 +121,7 @@ export default function ProductForm({ product, isEdit = false }: ProductFormProp
             <Button
               type="button"
               variant="secondary"
-              onClick={() => router.push("/dashboard/products")}
+              onClick={() => router.push("/products")}
             >
               Discard
             </Button>
@@ -290,9 +302,11 @@ export default function ProductForm({ product, isEdit = false }: ProductFormProp
                           </SelectTrigger>
                           <SelectContent>
                             <SelectGroup>
-                              <SelectItem value="DRAFT">Draft</SelectItem>
-                              <SelectItem value="ACTIVE">Active</SelectItem>
-                              <SelectItem value="ARCHIVED">Archived</SelectItem>
+                              {filters.statuses.map((status) => (
+                                <SelectItem key={status.value} value={status.value}>
+                                  {status.label}
+                                </SelectItem>
+                              ))}
                             </SelectGroup>
                           </SelectContent>
                         </Select>
@@ -326,12 +340,11 @@ export default function ProductForm({ product, isEdit = false }: ProductFormProp
                             </SelectTrigger>
                             <SelectContent>
                               <SelectGroup>
-                                <SelectItem value="Electronics">Electronics</SelectItem>
-                                <SelectItem value="Clothing">Clothing</SelectItem>
-                                <SelectItem value="Accessories">Accessories</SelectItem>
-                                <SelectItem value="Beauty">Beauty</SelectItem>
-                                <SelectItem value="Technology">Technology</SelectItem>
-                                <SelectItem value="Food">Food</SelectItem>
+                                {filters.categories.map((category) => (
+                                  <SelectItem key={category} value={category}>
+                                    {category}
+                                  </SelectItem>
+                                ))}
                               </SelectGroup>
                             </SelectContent>
                           </Select>

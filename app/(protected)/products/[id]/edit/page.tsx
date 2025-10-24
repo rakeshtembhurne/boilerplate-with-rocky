@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import ProductForm from "@/components/forms/product-form";
-import { getProduct } from "@/actions/product";
+import ProductForm from "../../_components/product-form";
+import { getProduct } from "../../_lib/server-api";
 
 export const metadata: Metadata = {
   title: "Edit Product",
