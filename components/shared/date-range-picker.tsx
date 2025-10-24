@@ -16,7 +16,7 @@ import { CalendarIcon } from "lucide-react";
 import type { DateRange } from "react-day-picker";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { useGlobalFilter } from "@/hooks/use-page-filters";
+import { useGlobalFilter, usePageFilters } from "@/hooks/use-page-filters";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -43,9 +43,10 @@ const dateFilterPresets = [
 
 interface DateRangePickerProps {
   className?: string;
+  pageKey?: string; // Optional page key for page-specific filters
 }
 
-export function DateRangePicker({ className }: DateRangePickerProps) {
+export function DateRangePicker({ className, pageKey }: DateRangePickerProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -59,12 +60,24 @@ export function DateRangePicker({ className }: DateRangePickerProps) {
     ? { from: new Date(urlDateFrom), to: new Date(urlDateTo) }
     : undefined;
 
-  // Use global filter for date range (persists across all pages)
-  const [dateRange, setDateRange] = useGlobalFilter<DateRange | undefined>({
+  // Use page-specific filter for date range if pageKey provided, otherwise global
+  // Always call hooks in the same order to satisfy React rules
+  const [pageSpecificDateRange, setPageSpecificDateRange] = usePageFilters<DateRange | undefined>({
+    pageKey: pageKey || "temp", // Use temp key if no pageKey to avoid conflicts
     filterKey: "date-range",
     defaultValue: { from: twentyEightDaysAgo, to: endOfDay(today) },
-    initialValue: initialDateRange,
+    initialValue: pageKey ? initialDateRange : undefined,
   });
+
+  const [globalDateRange, setGlobalDateRange] = useGlobalFilter<DateRange | undefined>({
+    filterKey: "date-range",
+    defaultValue: { from: twentyEightDaysAgo, to: endOfDay(today) },
+    initialValue: pageKey ? undefined : initialDateRange,
+  });
+
+  // Use the appropriate filter based on pageKey
+  const dateRange = pageKey ? pageSpecificDateRange : globalDateRange;
+  const setDateRange = pageKey ? setPageSpecificDateRange : setGlobalDateRange;
 
   const [open, setOpen] = React.useState(false);
   const [currentMonth, setCurrentMonth] = React.useState<Date>(

@@ -358,8 +358,8 @@ export default function ProductList({ data, pagination }: ProductListProps) {
   };
 
   // Active filters
-  const activeFiltersCount = selectedCategories.length + selectedStatuses.length + (searchValue ? 1 : 0);
   const hasDateFilter = searchParams.get("dateFrom") && searchParams.get("dateTo");
+  const activeFiltersCount = selectedCategories.length + selectedStatuses.length + (searchValue ? 1 : 0) + (hasDateFilter ? 1 : 0);
 
   const handleClearFilters = () => {
     // Clear page-specific filters
@@ -367,12 +367,12 @@ export default function ProductList({ data, pagination }: ProductListProps) {
     setSelectedStatuses([]);
     setSearchValue("");
 
-    // Clear date range from localStorage
+    // Clear date range from localStorage (global filter)
     if (typeof window !== "undefined") {
       localStorage.removeItem("global-filter-date-range");
     }
 
-    // Navigate to clean URL
+    // Navigate to clean URL (this will clear all URL params including dateFrom/dateTo)
     router.push("/products");
   };
 
@@ -381,7 +381,7 @@ export default function ProductList({ data, pagination }: ProductListProps) {
       {/* Active Filters Display */}
       {(activeFiltersCount > 0 || hasDateFilter) && (
         <div className="flex items-center gap-2 flex-wrap bg-muted/30 border-2 border-muted p-3 rounded-lg shadow-sm">
-          <span className="text-sm font-medium">Active filters:</span>
+          <strong className="text-sm font-bold">Active filters:</strong>
 
           {searchValue && (
             <div className="inline-flex items-center gap-1 bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-md text-sm">
@@ -420,7 +420,7 @@ export default function ProductList({ data, pagination }: ProductListProps) {
             className="ml-auto h-7 px-2.5 text-xs border-destructive text-destructive hover:bg-destructive hover:text-white"
           >
             <X className="mr-1 h-3 w-3" />
-            Clear all
+            Clear filters
           </Button>
         </div>
       )}

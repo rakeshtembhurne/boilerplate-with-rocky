@@ -66,7 +66,13 @@ export default function ProductsPage() {
             dateFrom,
             dateTo,
           }),
-          getProductStats(),
+          getProductStats({
+            search,
+            categories,
+            statuses,
+            dateFrom,
+            dateTo,
+          }),
         ]);
 
         setProducts(productsData.products);
@@ -99,7 +105,7 @@ export default function ProductsPage() {
       <div className="flex items-center justify-between space-y-2">
         <h1 className="text-2xl font-bold tracking-tight">Products</h1>
         <div className="flex items-center gap-2">
-          <DateRangePicker />
+           <DateRangePicker />
           <Link href="/products/create">
             <Button>
               <PlusIcon className="mr-2 h-4 w-4" /> Add Product

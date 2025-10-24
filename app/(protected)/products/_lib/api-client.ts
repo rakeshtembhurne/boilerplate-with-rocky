@@ -210,8 +210,38 @@ export interface ProductStats {
   totalValue: number;
 }
 
-export async function getProductStats(): Promise<ProductStats> {
-  const response = await fetch("/api/products/stats", {
+export async function getProductStats(params: {
+  search?: string;
+  categories?: string[];
+  statuses?: string[];
+  dateFrom?: string;
+  dateTo?: string;
+} = {}): Promise<ProductStats> {
+  const { search = "", categories = [], statuses = [], dateFrom = "", dateTo = "" } = params;
+
+  const queryParams = new URLSearchParams();
+
+  if (search) {
+    queryParams.set("search", search);
+  }
+
+  if (categories.length > 0) {
+    queryParams.set("categories", categories.join(","));
+  }
+
+  if (statuses.length > 0) {
+    queryParams.set("statuses", statuses.join(","));
+  }
+
+  if (dateFrom) {
+    queryParams.set("dateFrom", dateFrom);
+  }
+
+  if (dateTo) {
+    queryParams.set("dateTo", dateTo);
+  }
+
+  const response = await fetch(`/api/products/stats?${queryParams.toString()}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
