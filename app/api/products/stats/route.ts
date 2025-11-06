@@ -89,8 +89,9 @@ export async function GET(request: NextRequest) {
     }
 
     if (statuses.length > 0) {
-      conditions.push(`status = ANY($${queryParams.length + 1})`);
-      queryParams.push(statuses);
+      const statusPlaceholders = statuses.map((_, index) => `$${queryParams.length + index + 1}::"ProductStatus"`).join(', ');
+      conditions.push(`status IN (${statusPlaceholders})`);
+      queryParams.push(...statuses);
     }
 
     if (dateFrom && dateTo) {
