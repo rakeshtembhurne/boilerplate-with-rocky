@@ -91,6 +91,85 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
+## Docker Development
+
+### Quick Start with Docker
+
+1. **Generate AUTH_SECRET**:
+   ```bash
+   openssl rand -base64 32
+   ```
+
+2. **Configure Environment**:
+   ```bash
+   cp .env.docker .env.docker.local
+   # Edit .env.docker.local and add your AUTH_SECRET
+   ```
+
+3. **Start all services** (with seed data):
+   ```bash
+   docker compose --profile with-seed up -d
+   ```
+
+4. **Access the application**:
+   - App: http://localhost:3000
+   - Database: localhost:5432
+
+### Docker Commands
+
+```bash
+# View logs
+docker compose logs -f app
+
+# Stop services
+docker compose down
+
+# Rebuild after code changes
+docker compose up -d --build
+
+# Access database directly
+docker compose exec postgres psql -U postgres -d ai_starter_db
+
+# Run Prisma migrations
+docker compose exec app npx prisma migrate dev
+
+# Open Prisma Studio
+docker compose exec app npx prisma studio --browser none
+
+# Re-seed database
+docker compose --profile with-seed up seed --force-recreate
+```
+
+### Docker Services
+
+- **postgres**: PostgreSQL 18 database (persistent volume)
+- **app**: Next.js application with hot reload
+- **seed**: Optional database seeder (200 products)
+
+### Troubleshooting
+
+**Database connection errors**:
+```bash
+# Check if postgres is running
+docker compose ps postgres
+
+# Check logs
+docker compose logs postgres
+```
+
+**Port already in use**:
+```bash
+# Change port in docker-compose.yml
+ports:
+  - "3001:3000"  # Use different host port
+```
+
+**Reset everything**:
+```bash
+docker compose down -v  # Removes volumes
+docker compose --profile with-seed up -d  # Fresh start
+```
+
 ## Configuration
 
 All configuration is in the `config/` directory:
