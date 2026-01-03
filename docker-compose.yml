@@ -10,7 +10,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: ai_starter_db
-      PGDATA: /var/lib/postgresql/data/pgdata
+      # Remove PGDATA to fix permission issues in Podman
     ports:
       - "5432:5432"
     volumes:
@@ -63,30 +63,7 @@ services:
         condition: service_healthy
     networks:
       - ai-starter-network
-    command: sh -c "npm install && npx prisma generate && npx prisma migrate dev && npm run dev"
-
-  # Database Seeder (runs once and exits)
-  seed:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: base
-    container_name: ai-starter-seed
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ai_starter_db?schema=public
-    volumes:
-      - ./prisma:/app/prisma
-      - /app/node_modules
-    depends_on:
-      postgres:
-        condition: service_healthy
-      app:
-        condition: service_started
-    networks:
-      - ai-starter-network
-    profiles:
-      - with-seed
-    command: sh -c "npx prisma generate && npm run db:seed"
+    command: ["./docker-entrypoint.sh"]
 
 networks:
   ai-starter-network:

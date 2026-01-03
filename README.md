@@ -91,9 +91,9 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
-## Docker Development
+## Podman Development
 
-### Quick Start with Docker
+### Quick Start with Podman
 
 1. **Generate AUTH_SECRET**:
    ```bash
@@ -106,55 +106,59 @@ Open [http://localhost:3000](http://localhost:3000)
    # Edit .env.docker.local and add your AUTH_SECRET
    ```
 
-3. **Start all services** (with seed data):
+3. **Start all services**:
    ```bash
-   docker compose --profile with-seed up -d
+   podman-compose up -d
    ```
 
-4. **Access the application**:
+4. **Seed the database** (optional - adds 200 sample products):
+   ```bash
+   podman-compose exec app npm run db:seed
+   ```
+
+5. **Access the application**:
    - App: http://localhost:3000
    - Database: localhost:5432
 
-### Docker Commands
+### Podman Commands
 
 ```bash
 # View logs
-docker compose logs -f app
+podman-compose logs -f app
 
 # Stop services
-docker compose down
+podman-compose down
 
 # Rebuild after code changes
-docker compose up -d --build
+podman-compose up -d --build
 
 # Access database directly
-docker compose exec postgres psql -U postgres -d ai_starter_db
+podman-compose exec postgres psql -U postgres -d ai_starter_db
 
 # Run Prisma migrations
-docker compose exec app npx prisma migrate dev
+podman-compose exec app npx prisma migrate dev
 
 # Open Prisma Studio
-docker compose exec app npx prisma studio --browser none
+podman-compose exec app npx prisma studio --browser none
 
-# Re-seed database
-docker compose --profile with-seed up seed --force-recreate
+# Seed database (200 sample products)
+podman-compose exec app npm run db:seed
 ```
 
-### Docker Services
+### Podman Services
 
 - **postgres**: PostgreSQL 18 database (persistent volume)
 - **app**: Next.js application with hot reload
-- **seed**: Optional database seeder (200 products)
 
 ### Troubleshooting
 
 **Database connection errors**:
 ```bash
 # Check if postgres is running
-docker compose ps postgres
+podman-compose ps postgres
 
 # Check logs
-docker compose logs postgres
+podman-compose logs postgres
 ```
 
 **Port already in use**:
@@ -166,8 +170,9 @@ ports:
 
 **Reset everything**:
 ```bash
-docker compose down -v  # Removes volumes
-docker compose --profile with-seed up -d  # Fresh start
+podman-compose down -v  # Removes volumes
+podman-compose up -d  # Fresh start
+podman-compose exec app npm run db:seed  # Add seed data if needed
 ```
 
 ## Configuration

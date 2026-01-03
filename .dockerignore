@@ -54,6 +54,6 @@ docker-compose*.yml
 # OS
 Thumbs.db
 
-# Lock files (will be generated in container)
-package-lock.json
-bun.lock
+# Lock files (needed in container)
+# package-lock.json
+# bun.lock
