@@ -1,4 +1,5 @@
 const { withContentlayer } = require("next-contentlayer2");
+const path = require("path");
 
 import("./env.mjs");
 
@@ -6,6 +7,7 @@ import("./env.mjs");
 const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
+  outputFileTracingRoot: path.join(__dirname, '.'),
   images: {
     remotePatterns: [
       {
