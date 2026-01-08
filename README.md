@@ -1,327 +1,261 @@
-# AI with Rocky - Next.js Starter
+# AI Starter with Rocky - Next.js 16 Enterprise Boilerplate
 
-A modern, production-ready AI starter built with Next.js 15, featuring authentication, role-based authorization, and content management.
+A modern, production-ready Next.js 16 enterprise-grade boilerplate designed as a go-to foundation for multiple projects. It features a fully configurable architecture through environment variables, supporting multi-section content management (blog, docs, dashboard), user authentication, role-based authorization, and containerization with Podman.
+
+**Key Philosophy:** Everything is configurable - site names, emails, social links, feature flags - all through environment variables with type-safe validation.
 
 ## Features
 
-- ⚡ **Next.js 15** with App Router
-- 🔐 **Auth.js v5** with role-based access control (ADMIN/USER)
+- ⚡ **Next.js 16.1** with App Router and Turbopack (fastest development experience)
+- 🔐 **betterAuth 1.4.10** with email/password and OAuth authentication
+- 👥 **Role-based Access Control** (ADMIN/USER roles)
 - 📝 **MDX Content** for blog and documentation
-- 🎨 **shadcn/ui** components + Tailwind CSS
-- 🗄️ **Prisma** ORM with PostgreSQL
+- 🎨 **shadcn/ui v2** components + Tailwind CSS 4
+- 🗄️ **Prisma 7** ORM with PostgreSQL + Zod schema generation
 - 📧 **React Email** + Resend for transactional emails
 - ⚙️ **Fully Configurable** - Everything in `config/` folder
-
-## Known Issues
-
-### Next.js 15 + React 19 Development Mode Error
-
-**Issue**: React 19.2.0 has a known bug in development mode causing errors:
-- `Cannot read properties of undefined (reading 'A')`
-- `Cannot read properties of undefined (reading 'recentlyCreatedOwnerStacks')`
-
-**Why**: Next.js 15.5.6 requires React 19, but React 19.2.0 has development mode bugs.
-
-**Impact**:
-- ⚠️ Development server (`npm run dev`) shows errors on blog/docs pages
-- ✅ Production builds (`npm run build && npm start`) work **perfectly**
-
-**Workaround**: For testing without errors:
-```bash
-npm run build
-npm start
-```
-
-**Note**: This is a known React 19 issue. The framework is production-ready despite the dev mode warnings.
-
----
+- 🐳 **Podman** containerization with multi-stage builds
+- 🚀 **Bun** runtime for faster development and execution
 
 ## Quick Start
 
-### 1. Install Dependencies
-
+### Option 1: Local Development (Recommended)
 ```bash
-npm install
-```
+# Install dependencies
+bun install
 
-### 2. Configure Environment
-
-Copy `.env.example` to `.env.local` and fill in your values:
-
-```bash
+# Copy environment variables
 cp .env.example .env.local
+
+# Start development server with Turbo (fastest)
+make dev-turbo
+# or
+bun run turbo
 ```
 
-Required variables:
-- `NEXT_PUBLIC_APP_URL` - Your app URL
-- `AUTH_SECRET` - Generate with `openssl rand -base64 32`
-- `DATABASE_URL` - PostgreSQL connection string
-- `GOOGLE_CLIENT_ID` & `GOOGLE_CLIENT_SECRET` - OAuth credentials
-- `RESEND_API_KEY` - Email service API key
-
-### 3. Configure Your Site
-
-Edit `config/site.ts` to customize:
-
-```typescript
-export const siteConfig: SiteConfig = {
-  name: "Your Site Name",
-  description: "Your description",
-  url: site_url,
-  links: {
-    twitter: "https://twitter.com/yourhandle",
-    github: "https://github.com/yourusername/yourrepo",
-  },
-  mailSupport: "support@yourdomain.com",
-};
-```
-
-### 4. Set Up Database
-
+### Option 2: Container Development with Podman
 ```bash
-npx prisma migrate dev
-npx prisma generate
-```
+# Initialize development environment
+make init
 
-### 5. Run Development Server
+# Build containers
+make build
 
-```bash
-npm run dev
-```
+# Start all services
+make up
 
-Open [http://localhost:3000](http://localhost:3000)
-
-## Podman Development
-
-### Quick Start with Podman
-
-1. **Generate AUTH_SECRET**:
-   ```bash
-   openssl rand -base64 32
-   ```
-
-2. **Configure Environment**:
-   ```bash
-   cp .env.docker .env.docker.local
-   # Edit .env.docker.local and add your AUTH_SECRET
-   ```
-
-3. **Start all services**:
-   ```bash
-   podman-compose up -d
-   ```
-
-4. **Seed the database** (optional - adds 200 sample products):
-   ```bash
-   podman-compose exec app npm run db:seed
-   ```
-
-5. **Access the application**:
-   - App: http://localhost:3000
-   - Database: localhost:5432
-
-### Podman Commands
-
-```bash
 # View logs
-podman-compose logs -f app
-
-# Stop services
-podman-compose down
-
-# Rebuild after code changes
-podman-compose up -d --build
-
-# Access database directly
-podman-compose exec postgres psql -U postgres -d ai_starter_db
-
-# Run Prisma migrations
-podman-compose exec app npx prisma migrate dev
-
-# Open Prisma Studio
-podman-compose exec app npx prisma studio --browser none
-
-# Seed database (200 sample products)
-podman-compose exec app npm run db:seed
+make logs
 ```
 
-### Podman Services
+### Environment Setup
 
-- **postgres**: PostgreSQL 18 database (persistent volume)
-- **app**: Next.js application with hot reload
+1. **Copy environment files:**
+   ```bash
+   cp .env.example .env.local        # Local development
+   cp .env.podman .env.podman.local   # Container development
+   ```
 
-### Troubleshooting
+2. **Fill in required variables:**
+   - `BETTER_AUTH_SECRET` - Generate with `openssl rand -base64 32`
+   - `DATABASE_URL` - PostgreSQL connection string
+   - Optional: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
 
-**Database connection errors**:
+## Development Workflow
+
+### Local Development
 ```bash
-# Check if postgres is running
-podman-compose ps postgres
-
-# Check logs
-podman-compose logs postgres
+make dev           # Start development server locally
+make dev-turbo      # Start with Turbopack (recommended)
+make type-check     # Run TypeScript type checking
+make lint          # Run linter
+make format        # Format code
 ```
 
-**Port already in use**:
+### Database Operations
 ```bash
-# Change port in docker-compose.yml
-ports:
-  - "3001:3000"  # Use different host port
+bun run db:migrate     # Run database migrations
+bun run db:studio      # Open Prisma Studio
+bun run db:seed        # Seed database with sample data
+bun run db:reset       # Reset database (development only)
 ```
 
-**Reset everything**:
+### Container Development
 ```bash
-podman-compose down -v  # Removes volumes
-podman-compose up -d  # Fresh start
-podman-compose exec app npm run db:seed  # Add seed data if needed
+make build         # Build container image
+make up            # Start all services
+make down          # Stop all services
+make logs          # View logs
+make shell         # Get shell in app container
 ```
 
-## Configuration
+### Production Deployment
+```bash
+# Build for production
+make build
 
-All configuration is in the `config/` directory:
+# Start production services
+make up-prod
 
-- **`config/site.ts`** - Site name, description, social links, support email
-- **`config/dashboard.ts`** - Dashboard sidebar navigation with role-based access
-- **`config/blog.ts`** - Blog categories and authors
-- **`config/docs.ts`** - Documentation structure
-- **`config/marketing.ts`** - Marketing pages navigation
-
-Simply edit these files to customize your site!
+# View production logs
+make logs-prod
+```
 
 ## Project Structure
 
 ```
 ├── app/                    # Next.js App Router
-│   ├── (marketing)/        # Public pages
+│   ├── (marketing)/        # Public pages (landing, blog, docs)
 │   ├── (protected)/        # Protected routes (dashboard, admin)
-│   ├── (docs)/            # Documentation pages
+│   ├── (docs)/docs/        # Dynamic documentation pages
 │   └── api/               # API routes
 ├── components/            # React components
 │   ├── ui/               # shadcn/ui components
-│   ├── dashboard/        # Dashboard components
+│   ├── dashboard/        # Dashboard-specific components
 │   └── layout/           # Layout components
 ├── config/               # ⚙️ CONFIGURATION FILES - Edit these!
 ├── content/              # MDX content (blog & docs)
-├── lib/                  # Utilities
+├── lib/                  # Utilities (auth, db, email, etc.)
 ├── prisma/              # Database schema
-└── emails/              # Email templates
+├── emails/              # Email templates
+├── podman/              # Container configuration
+└── actions/             # Server actions
 ```
 
-## Available Commands
+## Configuration
 
-```bash
-# Development
-npm run dev            # Start dev server
-npm run turbo          # Start dev with Turbopack (faster)
+All configuration is centralized and type-safe through environment variables:
 
-# Production
-npm run build          # Build for production
-npm start              # Start production server
-
-# Database
-npx prisma migrate dev     # Run migrations
-npx prisma studio          # Open database GUI
-
-# Other
-npm run lint               # Run linter
-npm run email              # Email dev server (port 3333)
-npm run remove-content     # Remove blog/docs
-```
+- **`config/site.ts`** - Site metadata, links, global config
+- **`config/dashboard.ts`** - Dashboard navigation with role-based access
+- **`config/blog.ts`** - Blog settings and categories
+- **`config/docs.ts`** - Documentation structure
+- **`config/marketing.ts`** - Marketing pages navigation
 
 ## Tech Stack
 
-- **Framework:** Next.js 15.5.6
-- **React:** 19.2.0 (latest)
-- **Language:** TypeScript 5.9
-- **Database:** PostgreSQL with Prisma 6
-- **Auth:** Auth.js v5
-- **UI:** shadcn/ui + Radix UI + Tailwind CSS
+- **Runtime:** Bun 2.x
+- **Framework:** Next.js 16.1.1 (App Router + React Server Components)
+- **Language:** TypeScript 5.9+
+- **React:** React 19
+- **Database:** PostgreSQL 18 with Prisma 7+ and Zod schemas
+- **Auth:** betterAuth 1.4.10 (email/password + OAuth)
+- **UI:** shadcn/ui v2 + Radix UI + Tailwind CSS 4.1.14
 - **Content:** Contentlayer2 (MDX)
 - **Email:** React Email + Resend
+- **Containerization:** Podman 5.x
 
-## Customization Guide
+## Authentication & Authorization
 
-### Adding Blog Posts
+### Configuration
 
-Create `.mdx` files in `content/blog/`:
-
-```mdx
----
-title: "Your Post Title"
-description: "Post description"
-date: "2025-01-15"
-authors:
-  - author
-categories:
-  - news
----
-
-Your content here...
-```
-
-### Adding Documentation
-
-Create `.mdx` files in `content/docs/` and update `config/docs.ts` navigation.
-
-### Changing Colors
-
-Edit `app/globals.css` to customize your theme colors.
-
-### Adding OAuth Providers
-
-1. Add credentials to `.env.local`
-2. Update `auth.config.ts`
+betterAuth is configured in `lib/auth.ts` with full type safety:
 
 ```typescript
-import GitHub from "next-auth/providers/github"
+export const auth = betterAuth({
+  baseURL: process.env.NODE_ENV === "production"
+    ? env.NEXT_PUBLIC_APP_URL
+    : "http://localhost:3000",
+  database: prismaAdapter(prisma, { provider: "postgresql" }),
+  emailAndPassword: { enabled: true },
+  socialProviders: {
+    google: {
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+      enabled: true,
+    },
+  },
+})
+```
 
-export default {
-  providers: [
-    Google(...),
-    GitHub({
-      clientId: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    }),
-  ],
+### Session Structure
+
+User object includes:
+- `id` – User UUID
+- `email` – Email address (verified/unverified)
+- `name` – Display name
+- `image` – Profile picture URL
+- `role` – User role (`ADMIN` | `USER`)
+- `emailVerified` – Verification timestamp
+- `createdAt` – Account creation date
+- `updatedAt` – Last update timestamp
+
+### Role-Based Access Control
+
+**Defined in Prisma Schema:**
+```prisma
+enum Role {
+  ADMIN
+  USER
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      Role     @default(USER)
+  // ... other fields
 }
 ```
 
-## Deployment
+## Database Schema (Prisma + Zod)
 
-### Vercel (Recommended)
+### Schema Definition
 
-1. Push to GitHub
-2. Import project in Vercel
-3. Add environment variables
-4. Deploy!
+```prisma
+// prisma/schema.prisma
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["zodSchemas"]
+}
 
-Make sure to set all environment variables in your hosting platform.
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
-## License
+model User {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  name             String?
+  image            String?
+  role             Role      @default(USER)
+  emailVerified    DateTime?
+  accounts         Account[]
+  sessions         Session[]
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
-MIT
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+```
+
+### Auto-Generated Zod Schemas
+
+Prisma 7+ automatically generates Zod schemas that match your models:
+
+```typescript
+import { z } from "zod"
+import { UserSchema } from "@/lib/db" // Auto-generated
+
+// Extend auto-generated schema
+export const CreateUserSchema = UserSchema.partial({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).required({
+  email: true,
+})
+```
 
 ## Products Module - Plugin Architecture
 
-This project includes a self-contained products module demonstrating plugin-style architecture.
-
-### Module Structure
-
-```
-app/(protected)/products/
-├── _components/          # UI components (underscore = private)
-│   ├── product-form.tsx
-│   └── product-list.tsx
-├── _lib/                 # Business logic & utilities
-│   ├── api-client.ts    # REST API client
-│   ├── api-response.ts  # OpenAPI response utilities
-│   ├── cache.ts         # In-memory caching (5min TTL)
-│   └── server-api.ts    # Server-side data fetching
-├── _types/              # TypeScript definitions
-├── _validations/        # Zod schemas
-├── [id]/edit/          # Dynamic routes
-├── create/             # Static routes
-└── page.tsx            # Main list page
-```
+This project includes a self-contained products module demonstrating plugin-style architecture:
 
 ### REST API Endpoints
 
@@ -333,35 +267,6 @@ app/(protected)/products/
 | PUT | `/api/products/[id]` | Update product |
 | DELETE | `/api/products/[id]` | Delete product |
 | GET | `/api/products/filters` | Get filter options (cached 5min) |
-
-### OpenAPI Response Format
-
-**Success Response:**
-```json
-{
-  "success": true,
-  "data": { ... },
-  "message": "Operation successful",
-  "meta": {
-    "page": 1,
-    "pageSize": 10,
-    "total": 100,
-    "totalPages": 10
-  }
-}
-```
-
-**Error Response:**
-```json
-{
-  "success": false,
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Validation failed",
-    "details": { ... }
-  }
-}
-```
 
 ### TypeScript Path Alias
 
@@ -380,27 +285,175 @@ const { products, pagination } = await getProducts({
 });
 ```
 
-### Key Features
+## Containerization with Podman
 
-1. **Self-Contained**: All code in one folder
-2. **REST APIs**: OpenAPI-standard responses with proper error codes
-3. **Database Filters**: Categories and statuses fetched dynamically from DB
-4. **Caching**: 5-minute in-memory cache for filter data
-5. **Type-Safe**: Full TypeScript support with path aliases
-6. **Reusable Pattern**: Copy folder structure for new features
+### Development Workflow
 
-### Creating New Modules
+```bash
+# Make commands (recommended)
+make build         # Build container image
+make up            # Start all services
+make down          # Stop all services
+make logs          # View logs
 
-To create similar modules (orders, customers, etc):
+# Direct podman commands
+podman-compose -f podman/podman-compose.yml up -d
+podman-compose -f podman/podman-compose.yml down
+```
 
-1. Copy the products folder structure
-2. Add TypeScript alias in `tsconfig.json`:
-   ```json
-   "@/orders/*": ["./app/(protected)/orders/*"]
-   ```
-3. Create API routes in `app/api/orders/`
-4. Update navigation in `config/dashboard.ts`
+### Production Deployment
+
+```bash
+# Build for production
+make build
+
+# Start production services
+make up-prod
+
+# View production logs
+make logs-prod
+```
+
+## Environment Variables
+
+### Required
+```bash
+# App
+NEXT_PUBLIC_APP_URL=https://yourdomain.com
+
+# Auth
+BETTER_AUTH_SECRET=your-super-secret-key-min-32-chars
+BETTER_AUTH_URL=https://yourdomain.com
+
+# Database
+DATABASE_URL=postgresql://user:password@host:5432/dbname
+```
+
+### Optional - Authentication
+```bash
+# Google OAuth
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# GitHub OAuth
+GITHUB_CLIENT_ID=your-github-client-id
+GITHUB_CLIENT_SECRET=your-github-client-secret
+```
+
+### Optional - Site Customization
+```bash
+# Site Identity
+NEXT_PUBLIC_SITE_NAME=Your Site Name
+NEXT_PUBLIC_SITE_DESCRIPTION=Your site description
+NEXT_PUBLIC_SUPPORT_EMAIL=support@yourdomain.com
+
+# Social Links
+NEXT_PUBLIC_TWITTER_URL=https://twitter.com/yourhandle
+NEXT_PUBLIC_GITHUB_URL=https://github.com/yourusername
+NEXT_PUBLIC_LINKEDIN_URL=https://linkedin.com/in/yourprofile
+```
+
+### Optional - Feature Flags
+```bash
+# Enable/Disable Features
+ENABLE_BLOG=true
+ENABLE_DOCS=true
+ENABLE_ANALYTICS=false
+```
+
+## Development Commands
+
+```bash
+# Install dependencies
+bun install
+
+# Development servers
+bun run dev            # Standard dev server
+bun run turbo          # Dev with Turbopack (faster)
+
+# Production build and deployment
+bun run build          # Build for production
+bun start              # Start production server
+bun run preview        # Preview production build locally
+
+# Database
+bun run db:migrate     # Run database migrations
+bun run db:studio      # Open Prisma Studio
+bun run db:seed        # Seed database with sample data
+bun run db:reset       # Reset database (development only)
+
+# Code quality
+bun run lint           # Run linter
+bun run format         # Format code
+bun run type-check     # Run TypeScript type checking
+
+# Email development
+bun run email          # Email dev server
+
+# Content management
+bun run remove-content # Remove blog/docs sections
+
+# Container management
+bun run podman:up      # Start containers
+bun run podman:down    # Stop containers
+bun run podman:build   # Build containers
+bun run podman:logs    # View logs
+```
+
+## Deployment
+
+### Vercel (Recommended)
+1. Push to GitHub
+2. Import project in Vercel
+3. Add environment variables
+4. Deploy!
+
+### Docker/Podman
+1. Build container: `make build`
+2. Deploy to your container orchestrator
+3. Set environment variables
+
+## Troubleshooting
+
+### Common Issues
+
+**Port already in use:**
+```bash
+# Kill processes using port 3000
+lsof -ti:3000 | xargs kill -9
+```
+
+**Database connection errors:**
+- Verify `DATABASE_URL` is correct
+- Check if database container is running
+- Run `bun run db:studio` to inspect database
+
+**Build errors:**
+```bash
+# Clear Next.js cache
+rm -rf .next
+
+# Clear node_modules and reinstall
+rm -rf node_modules bun.lockb
+bun install
+```
+
+**Better Auth issues:**
+- Verify `BETTER_AUTH_SECRET` is set and consistent
+- Check `BETTER_AUTH_URL` matches your domain
+- Clear cookies and re-authenticate
+
+### Development Tips
+
+1. **Use Turbopack:** `bun run turbo` is significantly faster than standard dev server
+2. **Type Safety:** Run `bun run type-check` before committing
+3. **Database:** Use `bun run db:studio` to explore your database
+4. **Authentication:** Use `bun run dev` and test authentication flow locally first
+
+## License
+
+MIT
 
 ## Support
 
-For issues or questions, check the documentation in `/docs` or open an issue on GitHub.
+For issues or questions, check the documentation in `/docs` or create an issue on GitHub.

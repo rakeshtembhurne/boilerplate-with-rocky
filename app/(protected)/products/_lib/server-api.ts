@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { Decimal } from "@prisma/client/runtime/library";
+import { Prisma } from "@prisma/client";
 import type { Product } from "../_types";
 
 interface GetProductsParams {

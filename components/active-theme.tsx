@@ -2,6 +2,7 @@
 
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { DEFAULT_THEME, ThemeType } from "@/lib/themes";
+import { siteConfig } from "@/config/site";
 
 function setThemeCookie(key: string, value: string | null) {
   if (typeof window === "undefined") return;
@@ -27,8 +28,11 @@ export function ActiveThemeProvider({
   children: ReactNode;
   initialTheme?: ThemeType;
 }) {
+  // Get default theme preset from config, fallback to initialTheme, then DEFAULT_THEME
+  const configDefault = siteConfig.theme?.default || DEFAULT_THEME.preset;
+
   const [theme, setTheme] = useState<ThemeType>(() =>
-    initialTheme ? initialTheme : DEFAULT_THEME
+    initialTheme ? initialTheme : { ...DEFAULT_THEME, preset: configDefault as any }
   );
 
   useEffect(() => {

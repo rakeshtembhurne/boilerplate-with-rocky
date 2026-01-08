@@ -13,6 +13,11 @@ export type SiteConfig = {
     twitter: string;
     github: string;
   };
+  theme?: {
+    default?: string;
+    showThemeIcon?: boolean;
+    allowCustomTheme?: boolean;
+  };
 };
 
 export type NavItem = {

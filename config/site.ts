@@ -14,6 +14,15 @@ export const siteConfig: SiteConfig = {
     github: "https://github.com/yourusername/your-repo",
   },
   mailSupport: "support@example.com",
+  // Theme settings
+  theme: {
+    // Default theme for all users (can be overridden by user preferences)
+    default: "violet-bloom",
+    // Show/hide theme selector icon in the UI
+    showThemeIcon: true,
+    // Allow users to customize theme (if false, only default theme is used)
+    allowCustomTheme: true,
+  },
 };
 
 export const footerLinks: SidebarNavItem[] = [

@@ -151,6 +151,18 @@
   --font-display: var(--display-family);
   --display-weight: var(--display-weight);
   --font-sans: var(--text-family);
+
+  /* Font families from lib/fonts.ts */
+  --font-family-geist: var(--font-geist);
+  --font-family-inter: var(--font-inter);
+  --font-family-roboto: var(--font-roboto);
+  --font-family-plus-jakarta-sans: var(--font-plus-jakarta-sans);
+  --font-family-montserrat: var(--font-montserrat);
+  --font-family-poppins: var(--font-poppins);
+  --font-family-overpass-mono: var(--font-overpass-mono);
+  --font-family-pt-sans: var(--font-pt-sans);
+  --font-family-hedvig-letters-serif: var(--font-hedvig-letters-serif);
+  --font-family-kumbh-sans: var(--font-kumbh-sans);
 }
 
 * {

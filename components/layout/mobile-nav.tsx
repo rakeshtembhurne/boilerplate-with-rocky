@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSelectedLayoutSegment } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/auth-client";
 
 import { docsConfig } from "@/config/docs";
 import { marketingConfig } from "@/config/marketing";
@@ -74,7 +74,7 @@ export function NavMobile() {
 
           {session ? (
             <>
-              {session.user.role === "ADMIN" ? (
+              {(session as any)?.user?.role === "ADMIN" ? (
                 <li className="py-3">
                   <Link
                     href="/admin"
@@ -100,7 +100,7 @@ export function NavMobile() {
             <>
               <li className="py-3">
                 <Link
-                  href="/login"
+                  href="/sign-in"
                   onClick={() => setOpen(false)}
                   className="flex w-full font-medium capitalize"
                 >
@@ -110,7 +110,7 @@ export function NavMobile() {
 
               <li className="py-3">
                 <Link
-                  href="/register"
+                  href="/sign-up"
                   onClick={() => setOpen(false)}
                   className="flex w-full font-medium capitalize"
                 >

@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { useEffect } from "react";
-import { ChevronsUpDown } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useIsTablet } from "@/hooks/use-mobile";
 
@@ -20,12 +19,7 @@ import { NavMain } from "@/components/layout/sidebar/nav-main";
 import { NavUser } from "@/components/layout/sidebar/nav-user";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Logo from "@/components/layout/logo";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import { siteConfig } from "@/config/site";
+import { BrandName } from "@/components/layout/brand-name";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
@@ -47,22 +41,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton className="hover:text-foreground h-10 group-data-[collapsible=icon]:px-0! hover:bg-[var(--primary)]/5">
-                  <Logo />
-                  <span className="font-semibold">{siteConfig.name}</span>
-                  <ChevronsUpDown className="ml-auto group-data-[collapsible=icon]:hidden" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="mt-4 w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-                side={isMobile ? "bottom" : "right"}
-                align="end"
-                sideOffset={4}>
-                {/* Optional: Add project dropdown content here if needed */}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <SidebarMenuButton size="lg" className="hover:text-foreground data-[state=open]:bg-[var(--primary)]/5 group-data-[collapsible=icon]:!p-0 [&>svg]:size-6">
+              <Logo />
+              <BrandName className="text-xl font-bold group-data-[collapsible=icon]:hidden" />
+            </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>

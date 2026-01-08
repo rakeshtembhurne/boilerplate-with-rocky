@@ -6,6 +6,7 @@ import { DeleteAccountSection } from "@/components/dashboard/delete-account";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { UserNameForm } from "@/components/forms/user-name-form";
 import { UserRoleForm } from "@/components/forms/user-role-form";
+import { PasswordForm } from "@/components/forms/user-password-form";
 
 export const metadata = constructMetadata({
   title: "Settings – Next Template",
@@ -23,9 +24,10 @@ export default async function SettingsPage() {
         heading="Settings"
         text="Manage account and website settings."
       />
-      <div className="divide-y divide-muted pb-10">
+      <div className="grid gap-6 pb-10">
         <UserNameForm user={{ id: user.id, name: user.name || "" }} />
-        <UserRoleForm user={{ id: user.id, role: user.role }} />
+        <PasswordForm />
+        <UserRoleForm user={{ id: user.id, role: user.role || "USER" }} />
         <DeleteAccountSection />
       </div>
     </>

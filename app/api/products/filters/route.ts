@@ -1,5 +1,6 @@
-import { NextRequest } from "next/server";
-import { auth } from "@/auth";
+import { NextRequest } from "next/server"
+import { headers } from "next/headers"
+import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db";
 import { successResponse, ErrorResponses } from "@/products/_lib/api-response";
 import { withCache } from "@/products/_lib/cache";
@@ -16,7 +17,9 @@ export interface ProductFilters {
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    })
 
     if (!session?.user) {
       return ErrorResponses.unauthorized();

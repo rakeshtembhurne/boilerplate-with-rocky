@@ -1,16 +1,18 @@
+"use client"
+
 import {
   Dispatch,
   SetStateAction,
   useCallback,
   useMemo,
   useState,
-} from "react";
-import { signIn } from "next-auth/react";
+} from "react"
+import { authClient } from "@/lib/auth-client"
 
-import { siteConfig } from "@/config/site";
-import { Button } from "@/components/ui/button";
-import { Modal } from "@/components/ui/modal";
-import { Icons } from "@/components/shared/icons";
+import { siteConfig } from "@/config/site"
+import { Button } from "@/components/ui/button"
+import { Modal } from "@/components/ui/modal"
+import { Icons } from "@/components/shared/icons"
 
 function SignInModal({
   showSignInModal,
@@ -41,9 +43,20 @@ function SignInModal({
           <Button
             variant="default"
             disabled={signInClicked}
-            onClick={() => {
-              setSignInClicked(true);
-              signIn("google");
+            onClick={async () => {
+              setSignInClicked(true)
+              try {
+                // Use betterAuth's native social sign-in
+                await authClient.signIn.social({
+                  provider: "google",
+                  callbackURL: "/dashboard",
+                })
+              } catch (error) {
+                console.error("Google sign-in failed:", error)
+                setSignInClicked(false)
+                const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+                alert(`Sign in failed: ${errorMessage}`)
+              }
             }}
           >
             {signInClicked ? (

@@ -13,7 +13,7 @@ interface ProtectedLayoutProps {
 export default async function Dashboard({ children }: ProtectedLayoutProps) {
   const user = await getCurrentUser();
 
-  if (!user) redirect("/login");
+  if (!user) redirect("/sign-in");
 
   const cookieStore = await cookies();
   const defaultOpen =

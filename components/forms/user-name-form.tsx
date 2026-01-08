@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { updateUserName, type FormData } from "@/actions/update-user-name";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { User } from "@prisma/client";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/next-auth-compat";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -20,7 +20,7 @@ interface UserNameFormProps {
 }
 
 export function UserNameForm({ user }: UserNameFormProps) {
-  const { update } = useSession();
+  const { data: session } = useSession();
   const [updated, setUpdated] = useState(false);
   const [isPending, startTransition] = useTransition();
   const updateUserNameWithId = updateUserName.bind(null, user.id);
@@ -49,7 +49,7 @@ export function UserNameForm({ user }: UserNameFormProps) {
           description: "Your name was not updated. Please try again.",
         });
       } else {
-        await update();
+        // betterAuth automatically updates the session atom
         setUpdated(false);
         toast.success("Your name has been updated.");
       }
@@ -57,47 +57,53 @@ export function UserNameForm({ user }: UserNameFormProps) {
   });
 
   return (
-    <form onSubmit={onSubmit}>
-      <SectionColumns
-        title="Your Name"
-        description="Please enter a display name you are comfortable with."
-      >
-        <div className="flex w-full items-center gap-2">
-          <Label className="sr-only" htmlFor="name">
-            Name
-          </Label>
-          <Input
-            id="name"
-            className="flex-1"
-            size={32}
-            {...register("name")}
-            onChange={(e) => checkUpdate(e.target.value)}
-          />
-          <Button
-            type="submit"
-            variant={updated ? "default" : "disable"}
-            disabled={isPending || !updated}
-            className="w-[67px] shrink-0 px-0 sm:w-[130px]"
-          >
-            {isPending ? (
-              <Icons.spinner className="size-4 animate-spin" />
-            ) : (
-              <p>
-                Save
-                <span className="hidden sm:inline-flex">&nbsp;Changes</span>
-              </p>
-            )}
-          </Button>
+    <div className="rounded-lg border bg-card p-6">
+      <form onSubmit={onSubmit} className="space-y-4">
+        <div className="space-y-1">
+          <h3 className="text-lg font-semibold">Your Name</h3>
+          <p className="text-sm text-muted-foreground">
+            Please enter a display name you are comfortable with.
+          </p>
         </div>
-        <div className="flex flex-col justify-between p-1">
+
+        <div className="space-y-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
+            <div className="flex-1">
+              <Label htmlFor="name" className="sr-only">
+                Name
+              </Label>
+              <Input
+                id="name"
+                className="w-full"
+                {...register("name")}
+                onChange={(e) => checkUpdate(e.target.value)}
+                placeholder="Enter your name"
+              />
+            </div>
+            <Button
+              type="submit"
+              variant={updated ? "default" : "disable"}
+              disabled={isPending || !updated}
+              className="sm:w-auto"
+            >
+              {isPending ? (
+                <Icons.spinner className="size-4 animate-spin" />
+              ) : (
+                <>
+                  Save Changes
+                </>
+              )}
+            </Button>
+          </div>
+
           {errors?.name && (
-            <p className="pb-0.5 text-[13px] text-red-600">
+            <p className="text-sm text-red-600">
               {errors.name.message}
             </p>
           )}
-          <p className="text-[13px] text-muted-foreground">Max 32 characters</p>
+          <p className="text-xs text-muted-foreground">Max 32 characters</p>
         </div>
-      </SectionColumns>
-    </form>
+      </form>
+    </div>
   );
 }

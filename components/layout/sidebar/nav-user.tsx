@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/sidebar";
 import { BellIcon, CreditCardIcon, LogOutIcon, UserCircle2Icon } from "lucide-react";
 import { DotsVerticalIcon } from "@radix-ui/react-icons";
-import { useSession, signOut } from "next-auth/react";
+import { useSession, signOut } from "@/lib/next-auth-compat";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
@@ -90,7 +90,7 @@ export function NavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/login" })} className="gap-2">
+            <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })} className="gap-2">
               <LogOutIcon className="size-4" />
               Log out
             </DropdownMenuItem>

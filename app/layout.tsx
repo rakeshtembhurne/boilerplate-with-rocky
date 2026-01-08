@@ -1,8 +1,6 @@
 import "@/styles/globals.css";
 
 import { cookies } from "next/headers";
-import { fontVariables } from "@/lib/fonts";
-import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
 import NextTopLoader from "nextjs-toploader";
 
@@ -12,6 +10,7 @@ import GoogleAnalyticsInit from "@/lib/ga";
 import ModalProvider from "@/components/modals/providers";
 import { TailwindIndicator } from "@/components/tailwind-indicator";
 import { ActiveThemeProvider } from "@/components/active-theme";
+import { DynamicFontLoader } from "@/components/providers/dynamic-font-loader";
 import { DEFAULT_THEME } from "@/lib/themes";
 import { Metadata } from "next";
 
@@ -41,25 +40,24 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       <head />
       <body
         suppressHydrationWarning
-        className={cn("bg-background group/layout font-sans", fontVariables)}
+        className={cn("bg-background group/layout font-sans")}
         {...bodyAttributes}
       >
-        <SessionProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <ActiveThemeProvider initialTheme={themeSettings}>
-              <ModalProvider>{children}</ModalProvider>
-              <NextTopLoader color="var(--primary)" showSpinner={false} height={2} shadow-sm="none" />
-              {process.env.NODE_ENV === "production" ? <GoogleAnalyticsInit /> : null}
-              <Toaster position="top-center" richColors closeButton />
-              <TailwindIndicator />
-            </ActiveThemeProvider>
-          </ThemeProvider>
-        </SessionProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ActiveThemeProvider initialTheme={themeSettings}>
+            <DynamicFontLoader />
+            <ModalProvider>{children}</ModalProvider>
+            <NextTopLoader color="var(--primary)" showSpinner={false} height={2} shadow-sm="none" />
+            {process.env.NODE_ENV === "production" ? <GoogleAnalyticsInit /> : null}
+            <Toaster position="top-center" richColors closeButton />
+            <TailwindIndicator />
+          </ActiveThemeProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,14 +1,17 @@
-import { NextRequest } from "next/server";
-import { auth } from "@/auth";
+import { NextRequest } from "next/server"
+import { headers } from "next/headers"
+import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db";
 import { productSchema } from "@/products/_validations/product";
-import { Decimal } from "@prisma/client/runtime/library";
+import { Prisma } from "@prisma/client";
 import { successResponse, ErrorResponses } from "@/products/_lib/api-response";
 
 // GET /api/products - Get all products with filtering and pagination
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    })
 
     if (!session?.user) {
       return ErrorResponses.unauthorized();
@@ -94,7 +97,9 @@ export async function GET(request: NextRequest) {
 // POST /api/products - Create a new product
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    })
 
     if (!session?.user) {
       return ErrorResponses.unauthorized();
@@ -115,9 +120,9 @@ export async function POST(request: NextRequest) {
         description: validated.description,
         sku: validated.sku,
         barcode: validated.barcode,
-        price: new Decimal(validated.price),
+        price: new Prisma.Decimal(validated.price),
         discountedPrice: validated.discountedPrice
-          ? new Decimal(validated.discountedPrice)
+          ? new Prisma.Decimal(validated.discountedPrice)
           : null,
         stock: parseInt(validated.stock, 10),
         category: validated.category,

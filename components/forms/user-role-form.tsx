@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { updateUserRole, type FormData } from "@/actions/update-user-role";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { User, UserRole } from "@prisma/client";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/next-auth-compat";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -34,7 +34,7 @@ interface UserNameFormProps {
 }
 
 export function UserRoleForm({ user }: UserNameFormProps) {
-  const { update } = useSession();
+  const { data: session } = useSession();
   const [updated, setUpdated] = useState(false);
   const [isPending, startTransition] = useTransition();
   const updateUserRoleWithId = updateUserRole.bind(null, user.id);
@@ -58,7 +58,7 @@ export function UserRoleForm({ user }: UserNameFormProps) {
           description: "Your role was not updated. Please try again.",
         });
       } else {
-        await update();
+        // betterAuth automatically updates the session atom
         setUpdated(false);
         toast.success("Your role has been updated.");
       }
@@ -66,69 +66,72 @@ export function UserRoleForm({ user }: UserNameFormProps) {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <SectionColumns
-          title="Your Role"
-          description="Select the role what you want for test the app."
-        >
-          <div className="flex w-full items-center gap-2">
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem className="w-full space-y-0">
-                  <FormLabel className="sr-only">Role</FormLabel>
-                  <Select
-                    // TODO:(FIX) Option value not update. Use useState for the moment
-                    onValueChange={(value: UserRole) => {
-                      setUpdated(user.role !== value);
-                      setRole(value);
-                      // field.onChange;
-                    }}
-                    name={field.name}
-                    defaultValue={user.role}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a role" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {roles.map((role) => (
-                        <SelectItem key={role} value={role.toString()}>
-                          {role}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button
-              type="submit"
-              variant={updated ? "default" : "disable"}
-              disabled={isPending || !updated}
-              className="w-[67px] shrink-0 px-0 sm:w-[130px]"
-            >
-              {isPending ? (
-                <Icons.spinner className="size-4 animate-spin" />
-              ) : (
-                <p>
-                  Save
-                  <span className="hidden sm:inline-flex">&nbsp;Changes</span>
-                </p>
-              )}
-            </Button>
+    <div className="rounded-lg border bg-card p-6">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-1">
+            <h3 className="text-lg font-semibold">Your Role</h3>
+            <p className="text-sm text-muted-foreground">
+              Select the role what you want for test the app.
+            </p>
           </div>
-          <div className="flex flex-col justify-between p-1">
-            <p className="text-[13px] text-muted-foreground">
+
+          <div className="space-y-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem className="flex-1 space-y-0">
+                    <FormLabel className="sr-only">Role</FormLabel>
+                    <Select
+                      // TODO:(FIX) Option value not update. Use useState for the moment
+                      onValueChange={(value: UserRole) => {
+                        setUpdated(user.role !== value);
+                        setRole(value);
+                        // field.onChange;
+                      }}
+                      name={field.name}
+                      defaultValue={user.role}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select a role" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {roles.map((role) => (
+                          <SelectItem key={role} value={role.toString()}>
+                            {role}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="submit"
+                variant={updated ? "default" : "disable"}
+                disabled={isPending || !updated}
+                className="sm:w-auto"
+              >
+                {isPending ? (
+                  <Icons.spinner className="size-4 animate-spin" />
+                ) : (
+                  <>
+                    Save Changes
+                  </>
+                )}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
               Remove this field on real production
             </p>
           </div>
-        </SectionColumns>
-      </form>
-    </Form>
+        </form>
+      </Form>
+    </div>
   );
 }

@@ -1,5 +1,6 @@
 import {
   AlertTriangle,
+  ArrowLeft,
   ArrowRight,
   ArrowUpRight,
   BookOpen,
@@ -26,6 +27,7 @@ import {
   Plus,
   Search,
   Settings,
+  Star,
   SunMedium,
   Trash2,
   User,
@@ -36,6 +38,7 @@ export type Icon = LucideIcon;
 
 export const Icons = {
   add: Plus,
+  arrowLeft: ArrowLeft,
   arrowRight: ArrowRight,
   arrowUpRight: ArrowUpRight,
   chevronLeft: ChevronLeft,
@@ -46,6 +49,7 @@ export const Icons = {
   copy: Copy,
   dashboard: LayoutPanelLeft,
   ellipsis: MoreVertical,
+  star: Star,
   gitHub: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"

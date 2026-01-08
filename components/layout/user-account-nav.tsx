@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { LayoutDashboard, Lock, LogOut, Settings } from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "@/lib/next-auth-compat";
 import { Drawer } from "vaul";
 
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -18,7 +18,7 @@ import { UserAvatar } from "@/components/shared/user-avatar";
 
 export function UserAccountNav() {
   const { data: session } = useSession();
-  const user = session?.user;
+  const user = session?.user as any; // Type assertion to include role field
 
   const [open, setOpen] = useState(false);
   const closeDrawer = () => {

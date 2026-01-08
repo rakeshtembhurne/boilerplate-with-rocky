@@ -1,20 +1,23 @@
-"use server";
+"use server"
 
-import { auth } from "@/auth";
-import { prisma } from "@/lib/db";
-import { userNameSchema } from "@/lib/validations/user";
-import { revalidatePath } from "next/cache";
+import { headers } from "next/headers"
+import { auth } from "@/lib/auth"
+import { prisma } from "@/lib/db"
+import { userNameSchema } from "@/lib/validations/user"
+import { revalidatePath } from "next/cache"
 
 export type FormData = {
-  name: string;
-};
+  name: string
+}
 
 export async function updateUserName(userId: string, data: FormData) {
   try {
-    const session = await auth()
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    })
 
     if (!session?.user || session?.user.id !== userId) {
-      throw new Error("Unauthorized");
+      throw new Error("Unauthorized")
     }
 
     const { name } = userNameSchema.parse(data);
