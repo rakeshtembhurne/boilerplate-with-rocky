@@ -1,0 +1,65 @@
+# Containerfile - Optimized for size and performance
+FROM docker.io/oven/bun:1.3.5-alpine AS base
+WORKDIR /app
+
+# ─────────────────────────────────────────────────────────────
+# Install dependencies in a single stage
+# ─────────────────────────────────────────────────────────────
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile --ignore-scripts
+
+# ─────────────────────────────────────────────────────────────
+# Build stage
+# ─────────────────────────────────────────────────────────────
+ARG DATABASE_URL=postgresql://postgres:postgres@db:5432/ai_starter_db
+ARG BETTER_AUTH_SECRET=eOAB8lAqjk8gNB75naxaizQem9brsVN2PavlrPyuW/w=
+ARG BETTER_AUTH_URL=http://localhost:3000
+ARG GOOGLE_CLIENT_ID=your_google_client_id_here
+ARG GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+ARG RESEND_API_KEY=dummy
+ARG NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Fail fast if critical build-time vars are missing
+RUN test -n "$NEXT_PUBLIC_APP_URL" || (echo "NEXT_PUBLIC_APP_URL is required" && exit 1)
+
+ENV DATABASE_URL=${DATABASE_URL} \
+  BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET} \
+  BETTER_AUTH_URL=${BETTER_AUTH_URL} \
+  GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID} \
+  GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET} \
+  RESEND_API_KEY=${RESEND_API_KEY} \
+  NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
+
+COPY . .
+
+# Generate Prisma Client
+RUN bun run postinstall
+
+# Build application
+RUN NODE_ENV=production bun run build
+
+# ─────────────────────────────────────────────────────────────
+# Production stage
+# ─────────────────────────────────────────────────────────────
+FROM base AS production
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+WORKDIR /app
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
+EXPOSE 3000
+
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["node", "server.js"]

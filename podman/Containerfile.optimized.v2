@@ -1,0 +1,61 @@
+# Containerfile - Highly optimized for size
+FROM docker.io/oven/bun:1.3.5-alpine AS base
+WORKDIR /app
+
+# Copy dependency files first for better caching
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile --ignore-scripts
+
+# Copy and install dependencies with caching
+COPY --chown=0:0 prisma/ ./prisma/
+COPY --chown=0:0 tsconfig.json ./
+COPY --chown=0:0 next.config.ts ./
+COPY --chown=0:0 tailwind.config.ts ./
+COPY --chown=0:0 postcss.config.js ./
+COPY --chown=0:0 contentlayer.config.ts ./
+COPY --chown=0:0 env.mjs ./
+
+RUN bun run postinstall
+
+# Build stage
+ARG DATABASE_URL=postgresql://postgres:postgres@db:5432/ai_starter_db
+ARG BETTER_AUTH_SECRET=eOAB8lAqjk8gNB75naxaizQem9brsVN2PavlrPyuW/w=
+ARG BETTER_AUTH_URL=http://localhost:3000
+ARG GOOGLE_CLIENT_ID=your_google_client_id_here
+ARG GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+ARG RESEND_API_KEY=dummy
+ARG NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+ENV DATABASE_URL=${DATABASE_URL} \
+  BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET} \
+  BETTER_AUTH_URL=${BETTER_AUTH_URL} \
+  GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID} \
+  GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET} \
+  RESEND_API_KEY=${RESEND_API_KEY} \
+  NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
+
+COPY --chown=0:0 . .
+
+RUN bun run build
+
+# Production stage with minimal layers
+FROM base AS production
+ENV NODE_ENV=production \
+  NEXT_TELEMETRY_DISABLED=1
+
+WORKDIR /app
+
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
+EXPOSE 3000
+
+ENV PORT=3000 HOSTNAME="0.0.0.0"
+
+CMD ["node", "server.js"]
