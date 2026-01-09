@@ -108,8 +108,9 @@ Must be one of:
 ### Scope (Optional)
 
 The scope should be the name of the plugin/module affected:
-- **auth** – Authentication changes
+- **blogging** – Blogging plugin changes
 - **products** – Products plugin changes
+- **auth** – Authentication changes
 - **database** – Database schema/migrations
 - **ui** – UI components
 - **api** – API routes
@@ -139,24 +140,24 @@ The scope should be the name of the plugin/module affected:
 
 ```bash
 # Simple feature
-feat(products): add product filtering by category
+feat(blogging): add markdown support for posts
 
 # Bug fix
-fix(auth): resolve session timeout on mobile devices
+fix(authors): resolve author profile image upload issue
 
 # Documentation
-docs(readme): update installation instructions for Podman
+docs readme: update installation instructions for Podman
 
 # Breaking change
-feat(api): redesign product response structure
+feat api): redesign product response structure
 
 BREAKING CHANGE: Product response now uses nested structure
 for variants. Update API clients accordingly.
 
 # Multiple lines
-feat(products): implement bulk product import
+feat(blogging): implement bulk post import
 
-Add CSV upload functionality for importing multiple products
+Add CSV upload functionality for importing multiple blog posts
 at once. This includes validation, error handling, and
 progress tracking.
 
@@ -171,104 +172,209 @@ Closes #123, #456
 
 ## Plugin Architecture
 
-This boilerplate uses a **pluggable modular architecture** where each feature is a self-contained plugin that can be easily added or removed.
+This boilerplate uses a **pluggable modular architecture** where each feature is a self-contained plugin organized as a route group with parentheses `(plugin-name)`.
 
 ### Plugin Structure
 
-Each plugin follows this standard structure under `app/(protected)/`:
+Each plugin is created as a **route group** under `app/(protected)/` using parentheses:
 
 ```
-app/(protected)/<plugin-name>/
-├── _components/          # Plugin-specific UI components
-│   ├── <component-a>.tsx
-│   └── <component-b>.tsx
-├── _lib/                 # Plugin business logic
-│   ├── server-api.ts     # Server-side API calls
-│   ├── api-client.ts     # Client-side API wrapper
-│   ├── api-response.ts   # TypeScript interfaces
-│   └── cache.ts          # Query caching logic
-├── _types/               # TypeScript type definitions
-│   └── index.ts
-├── _validations/         # Zod validation schemas
-│   └── <entity>.ts
-├── page.tsx              # Main plugin page (list view)
-├── create/
-│   └── page.tsx          # Create entity page
-└── [id]/
-    └── edit/
-        └── page.tsx      # Edit entity page
+app/(protected)/
+├── (plugin-name)/              # Plugin route group
+│   ├── sub-feature-a/          # Sub-feature A
+│   │   ├── _components/        # Sub-feature components
+│   │   ├── _lib/               # Sub-feature logic
+│   │   ├── _types/             # Sub-feature types
+│   │   ├── _validations/       # Sub-feature validations
+│   │   ├── page.tsx            # Sub-feature list page
+│   │   ├── create/page.tsx     # Create entity page
+│   │   └── [id]/edit/page.tsx  # Edit entity page
+│   └── sub-feature-b/          # Sub-feature B
+│       ├── _components/
+│       ├── _lib/
+│       └── page.tsx
+```
+
+### Key Points
+
+1. **Plugin Folder**: Uses parentheses `(plugin-name)` to create a route group
+   - Doesn't appear in URL (e.g., `/dashboard/authors` not `/dashboard/(blogging)/authors`)
+   - Logical grouping for organization
+   - Can contain multiple sub-features
+
+2. **Sub-Features**: Each sub-feature has its own structure
+   - Can be organized any way that makes sense
+   - Each sub-feature has its own `_components`, `_lib`, `_types`, `_validations`
+   - Independent within the plugin
+
+3. **Underscore Prefix**: Private folders use underscore prefix
+   - `_components/` – UI components
+   - `_lib/` – Business logic
+   - `_types/` – TypeScript types
+   - `_validations/` – Zod schemas
+
+### Example: Blogging Plugin
+
+A blogging plugin with authors and posts sub-features:
+
+```
+app/(protected)/
+└── (blogging)/                          # Plugin route group
+    ├── authors/                         # Authors sub-feature
+    │   ├── _components/
+    │   │   ├── author-form.tsx
+    │   │   └── author-list.tsx
+    │   ├── _lib/
+    │   │   ├── server-api.ts
+    │   │   ├── api-client.ts
+    │   │   └── cache.ts
+    │   ├── _types/
+    │   │   └── index.ts
+    │   ├── _validations/
+    │   │   └── author.ts
+    │   ├── page.tsx                     # /dashboard/authors
+    │   ├── create/page.tsx              # /dashboard/authors/create
+    │   └── [id]/
+    │       └── edit/page.tsx            # /dashboard/authors/123/edit
+    └── posts/                           # Posts sub-feature
+        ├── _components/
+        │   ├── post-form.tsx
+        │   └── post-list.tsx
+        ├── _lib/
+        │   ├── server-api.ts
+        │   ├── api-client.ts
+        │   └── cache.ts
+        ├── _types/
+        │   └── index.ts
+        ├── _validations/
+        │   └── post.ts
+        ├── page.tsx                     # /dashboard/posts
+        ├── create/page.tsx              # /dashboard/posts/create
+        └── [id]/
+            └── edit/page.tsx            # /dashboard/posts/456/edit
+
+app/api/blogging/                        # API routes (separate)
+├── authors/
+│   ├── route.ts                         # GET/POST /api/blogging/authors
+│   └── [id]/route.ts                    # GET/PUT/DELETE /api/blogging/authors/[id]
+└── posts/
+    ├── route.ts                         # GET/POST /api/blogging/posts
+    └── [id]/route.ts                    # GET/PUT/DELETE /api/blogging/posts/[id]
+```
+
+### Example: E-commerce Plugin
+
+An e-commerce plugin with inventory and orders sub-features:
+
+```
+app/(protected)/
+└── (ecommerce)/                         # Plugin route group
+    ├── inventory/                       # Inventory sub-feature
+    │   ├── _components/
+    │   │   ├── product-form.tsx
+    │   │   └── inventory-list.tsx
+    │   ├── _lib/
+    │   │   └── server-api.ts
+    │   ├── page.tsx                     # /dashboard/inventory
+    │   └── [id]/edit/page.tsx
+    ├── orders/                          # Orders sub-feature
+    │   ├── _components/
+    │   │   ├── order-form.tsx
+    │   │   └── order-list.tsx
+    │   ├── _lib/
+    │   │   └── server-api.ts
+    │   ├── page.tsx                     # /dashboard/orders
+    │   └── [id]/
+    │       └── page.tsx                 # /dashboard/orders/123
+    └── customers/                       # Customers sub-feature
+        ├── _components/
+        ├── _lib/
+        └── page.tsx                     # /dashboard/customers
+
+app/api/ecommerce/                       # API routes
+├── inventory/route.ts
+├── orders/route.ts
+└── customers/route.ts
 ```
 
 ### Plugin Rules
 
-1. **Self-Contained**: All plugin code (except API routes) MUST be within the plugin folder
-2. **Underscore Prefix**: Private folders use underscore prefix (`_components`, `_lib`, `_types`)
-3. **No External Dependencies**: Plugin should not import from other plugins
-4. **API Separation**: API routes go in `app/api/<plugin-name>/` (outside plugin folder)
-5. **Shared Utilities**: Common utilities go in `lib/` (can be used by multiple plugins)
+1. **Route Group Naming**: Plugin folder MUST use parentheses `(plugin-name)`
+   - Creates logical grouping without affecting URL structure
+   - Multiple plugins can coexist in `app/(protected)/`
+
+2. **Sub-Feature Organization**: Organize sub-features any way that makes sense
+   - Each sub-feature has its own `_components`, `_lib`, `_types`, `_validations`
+   - Sub-features can share types/lib from the plugin level if needed
+   - Use folder structure that best fits your domain
+
+3. **Self-Contained**: All plugin code (except API routes) MUST be within the plugin route group
+   - Components in `_components/`
+   - Business logic in `_lib/`
+   - Types in `_types/`
+   - Validations in `_validations/`
+
+4. **No Inter-Plugin Dependencies**: Plugins should not import from other plugins
+   - Use `lib/` for shared utilities
+   - Keep plugins independent
+   - Enables easy addition/removal
+
+5. **API Separation**: API routes go in `app/api/<plugin-name>/`
+   - Separate from plugin folder structure
+   - Organized by sub-feature if needed
+   - Follow REST conventions
+
 6. **Independent Removal**: Removing the plugin folder should completely remove the feature
-
-### Example: Products Plugin
-
-```
-app/(protected)/products/
-├── _components/
-│   ├── product-form.tsx       # Add/edit form
-│   └── product-list.tsx       # Data table with filters
-├── _lib/
-│   ├── server-api.ts          # Server actions for products
-│   ├── api-client.ts          # Client wrapper with caching
-│   ├── api-response.ts        # Response type definitions
-│   └── cache.ts               # React Query cache keys
-├── _types/
-│   └── index.ts               # Product interfaces
-├── _validations/
-│   └── product.ts             # Zod schema for product validation
-├── page.tsx                   # Products list page
-├── create/page.tsx            # Create new product
-└── [id]/edit/page.tsx         # Edit existing product
-
-app/api/products/              # API routes (separate location)
-├── route.ts                   # GET /api/products, POST /api/products
-├── [id]/route.ts              # GET/PUT/DELETE /api/products/[id]
-├── filters/route.ts           # GET /api/products/filters
-└── stats/route.ts             # GET /api/products/stats
-```
+   - No broken imports
+   - Clean removal possible
 
 ### Creating a New Plugin
 
-When adding a new plugin (e.g., "orders"):
+When adding a new plugin (e.g., "bookings"):
 
-1. **Create Plugin Structure:**
+1. **Create Plugin Route Group:**
    ```bash
-   mkdir -p app/(protected)/orders/{_components,_lib,_types,_validations}
-   mkdir -p app/(protected)/orders/{create,[id]/edit}
+   mkdir -p "app/(protected)/(bookings)"
    ```
 
-2. **Add Plugin Files:**
-   - Create components in `_components/`
-   - Add business logic in `_lib/`
-   - Define types in `_types/`
-   - Add validation schemas in `_validations/`
-   - Create pages: `page.tsx`, `create/page.tsx`, `[id]/edit/page.tsx`
-
-3. **Create API Routes:**
+2. **Add Sub-Features:**
    ```bash
-   mkdir -p app/api/orders/[id]
+   # Create bookings sub-feature
+   mkdir -p "app/(protected)/(bookings)/bookings"/{_components,_lib,_types,_validations}
+   mkdir -p "app/(protected)/(bookings)/bookings"/{create,[id]/edit}
+
+   # Create availability sub-feature
+   mkdir -p "app/(protected)/(bookings)/availability"/{_components,_lib}
+
+   # Create calendar sub-feature
+   mkdir -p "app/(protected)/(bookings)/calendar"/{_components,_lib}
    ```
 
-4. **Update Navigation:**
-   - Add to `config/dashboard.ts` (if menu item needed)
+3. **Add Plugin Files:**
+   - Create components in each sub-feature's `_components/`
+   - Add business logic in each sub-feature's `_lib/`
+   - Define types in each sub-feature's `_types/`
+   - Add validation schemas in each sub-feature's `_validations/`
+   - Create pages for each sub-feature
 
-5. **Test Plugin Independence:**
-   - Verify removing the folder removes the feature
+4. **Create API Routes:**
+   ```bash
+   mkdir -p app/api/bookings/bookings
+   mkdir -p app/api/bookings/availability
+   ```
+
+5. **Update Navigation:**
+   - Add to `config/dashboard.ts` (if menu items needed)
+
+6. **Test Plugin Independence:**
+   - Verify removing the plugin folder removes the feature
    - Ensure no broken imports remain
 
 ### Removing a Plugin
 
 To completely remove a plugin:
 
-1. Delete plugin folder: `rm -rf app/(protected)/<plugin-name>/`
+1. Delete plugin folder: `rm -rf "app/(protected)/(plugin-name)/"`
 2. Delete API routes: `rm -rf app/api/<plugin-name>/`
 3. Remove from navigation: Edit `config/dashboard.ts`
 4. Remove database models (if applicable): Edit `prisma/schema.prisma`
@@ -328,7 +434,7 @@ bun run podman:logs    # View logs
   - `(auth)/` – Authentication pages (sign-in, sign-up, password reset)
   - `(marketing)/` – Public pages, landing page
   - `(protected)/` – Protected routes requiring authentication
-    - Contains all plugin directories
+    - Contains all plugin route groups `(plugin-name)/`
   - `(docs)/` – Documentation pages
   - `api/` – API routes (organized by plugin)
 
@@ -368,8 +474,10 @@ bun run podman:logs    # View logs
 ## Key Conventions
 
 ### 1. Plugin Architecture
-- All plugins MUST be self-contained
-- Use underscore prefix for private folders (`_components`, `_lib`, `_types`)
+- Plugins are route groups: `(plugin-name)/`
+- Each plugin can have multiple sub-features
+- Sub-features organized in any logical way
+- Use underscore prefix for private folders
 - API routes are separate from plugin folder structure
 - Never import from one plugin to another
 
@@ -377,9 +485,16 @@ bun run podman:logs    # View logs
 - `(auth)/` – Authentication routes (no layout)
 - `(marketing)/` – Public pages
 - `(protected)/` – Protected routes with authentication
+  - Contains plugin route groups: `(blogging)/`, `(products)/`, etc.
 - `(docs)/` – Documentation
 
-### 3. Async Parameters
+### 3. Sub-Feature Organization
+- Each sub-feature has its own structure
+- Can organize by domain/logic (e.g., authors, posts, categories)
+- Each has `_components/`, `_lib/`, `_types/`, `_validations/`
+- Independent within the plugin
+
+### 4. Async Parameters
 Always await `params` and `searchParams` in pages:
 ```typescript
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
@@ -388,45 +503,39 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 }
 ```
 
-### 4. Components
+### 5. Components
 - Use Server Components by default
 - Add `"use client"` only when interactive features are needed
 - Shared UI components go in `components/ui/`
-- Plugin-specific components go in `<plugin>/_components/`
+- Plugin-specific components go in `<plugin>/<sub-feature>/_components/`
 
-### 5. Database Changes
+### 6. Database Changes
 1. Update `prisma/schema.prisma`
 2. Run `bun run db:migrate` to create migration
 3. Run `bun run postinstall` to regenerate Prisma client
 4. Update plugin `_validations/` if schema affects plugin
 
-### 6. Forms
+### 7. Forms
 - Use React Hook Form with Zod validation
 - Server actions for form submissions
-- Validation schemas in plugin `_validations/` folder
+- Validation schemas in sub-feature `_validations/` folder
 - Use `schema.safeParse()` in Server Actions
 
-### 7. Authentication
+### 8. Authentication
 - Configured in `lib/auth.ts`
 - Role-based access control (`ADMIN` | `USER`)
 - Check session in protected pages
 
-### 8. Environment Variables
+### 9. Environment Variables
 - Validate in `env.mjs` using @t3-oss/env-nextjs
 - Server variables use `env.*` (no `NEXT_PUBLIC_`)
 - Client variables use `env.NEXT_PUBLIC_*`
 - Add new vars to `.env.example`
 
-### 9. Styling
+### 10. Styling
 - Tailwind CSS 4.x with custom theme
 - Components use Tailwind classes directly
 - No CSS modules or global styles
-
-### 10. Code Organization
-- Keep plugins independent and self-contained
-- Don't create circular dependencies
-- Use TypeScript strict mode
-- Follow the established folder structure
 
 ## Important Notes
 
@@ -438,6 +547,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 - **Await Promises**: Always await `params` and `searchParams`
 - **Environment Config**: Everything via environment variables
 - **Podman First**: Use Podman (not Docker) for containers
+- **Manual Testing**: Always test manually before committing
 
 ## File Locations
 
@@ -447,19 +557,21 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 - Site config: `config/site.ts`
 - Dashboard nav: `config/dashboard.ts`
 - Container config: `podman/`
-- Plugin example: `app/(protected)/products/`
+- Plugin example: `app/(protected)/(blogging)/`
 
 ## Adding a New Plugin Checklist
 
 When adding a new feature as a plugin:
 
-- [ ] Create plugin folder structure with `_components`, `_lib`, `_types`, `_validations`
-- [ ] Build all UI components in `_components/`
-- [ ] Implement server API in `_lib/server-api.ts`
-- [ ] Create client wrapper in `_lib/api-client.ts`
-- [ ] Define types in `_types/index.ts`
-- [ ] Add Zod schemas in `_validations/`
-- [ ] Create pages: `page.tsx`, `create/page.tsx`, `[id]/edit/page.tsx`
+- [ ] Create plugin route group: `app/(protected)/(plugin-name)/`
+- [ ] Plan sub-features (e.g., authors, posts, categories)
+- [ ] Create sub-feature folders with structure
+- [ ] Build all UI components in each `_components/`
+- [ ] Implement server API in each `_lib/server-api.ts`
+- [ ] Create client wrapper in each `_lib/api-client.ts`
+- [ ] Define types in each `_types/index.ts`
+- [ ] Add Zod schemas in each `_validations/`
+- [ ] Create pages for each sub-feature
 - [ ] Add API routes in `app/api/<plugin-name>/`
 - [ ] Update `config/dashboard.ts` for navigation
 - [ ] Update Prisma schema if needed
@@ -467,22 +579,23 @@ When adding a new feature as a plugin:
 - [ ] Test plugin works independently
 - [ ] Test removing folder removes functionality
 - [ ] Create feature branch from `develop`
+- [ ] Manual testing before committing
 - [ ] Commit with Google-style message
 - [ ] Merge back to `develop` with `--no-ff`
 
 ## Plugin Best Practices
 
-1. **Encapsulation**: Keep all plugin code within the plugin directory
-2. **No Coupling**: Don't import from other plugins
-3. **Shared Types**: Put shared types in `lib/types/`
-4. **API Consistency**: Follow REST conventions for API routes
-5. **Error Handling**: Implement proper error handling in `_lib/`
-6. **Loading States**: Add loading skeletons in `_components/`
-7. **Validation**: Use Zod schemas in `_validations/`
-8. **Testing**: Test plugin independently before integration
-9. **Documentation**: Document plugin-specific logic in code comments
+1. **Logical Organization**: Group sub-features by domain logic
+2. **Encapsulation**: Keep all plugin code within the plugin route group
+3. **No Coupling**: Don't import from other plugins
+4. **Shared Types**: Put shared types in `lib/types/`
+5. **API Consistency**: Follow REST conventions for API routes
+6. **Error Handling**: Implement proper error handling in `_lib/`
+7. **Loading States**: Add loading skeletons in `_components/`
+8. **Validation**: Use Zod schemas in `_validations/`
+9. **Testing**: Test plugin independently before integration
 10. **Clean Removal**: Ensure plugin can be removed cleanly
 
 ---
 
-**Remember:** This is a boilerplate for creating applications. The plugin architecture makes it easy to add/remove features. Always follow Git Flow and use proper commit messages!
+**Remember:** This is a boilerplate for creating applications. The plugin architecture with route groups makes it easy to add/remove features. Always follow Git Flow, use proper commit messages, and test manually before committing!
