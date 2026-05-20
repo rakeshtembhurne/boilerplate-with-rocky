@@ -1,15 +1,23 @@
-import { auth } from "@/lib/auth"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import { headers } from "next/headers"
+import { cookies } from "next/headers"
 
 // Proxy always runs on Node.js runtime - no explicit runtime needed
 
 export default async function proxy(request: NextRequest) {
-  // Get session using betterAuth
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  })
+  // Read session from cookie (set by client-side login)
+  const cookieStore = await cookies()
+  const sessionCookie = cookieStore.get("brandsome_session")
+  
+  let session = null
+  if (sessionCookie?.value) {
+    try {
+      const user = JSON.parse(decodeURIComponent(sessionCookie.value))
+      session = { user }
+    } catch {
+      session = null
+    }
+  }
 
   const { pathname } = request.nextUrl
 
@@ -20,7 +28,7 @@ export default async function proxy(request: NextRequest) {
     }
   }
 
-  // Protect protected routes - require authentication
+  // Protect dashboard routes - require authentication
   if (pathname.startsWith("/dashboard") || pathname.startsWith("/protected")) {
     if (!session?.user) {
       const signInUrl = new URL("/auth/sign-in", request.url)

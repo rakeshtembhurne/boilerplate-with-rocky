@@ -78,8 +78,8 @@ export function SignInForm() {
         toast.success("Welcome back!", {
           description: "You are now signed in.",
         })
-        router.push(searchParams?.get("from") || "/dashboard")
-        setIsLoading(false)
+        // Use window.location for full page reload to ensure session is read
+        window.location.href = searchParams?.get("from") || "/dashboard"
       },
     })
   }
@@ -177,7 +177,7 @@ export function SignInForm() {
           Don&apos;t have an account?{" "}
         </span>
         <Link
-          href="/sign-up"
+          href="/auth/sign-up"
           className="font-medium text-primary hover:underline"
         >
           Sign up

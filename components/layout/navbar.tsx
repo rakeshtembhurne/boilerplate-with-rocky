@@ -111,7 +111,7 @@ export function NavBar({ scroll = false }: NavBarProps) {
               </Button>
             </Link>
           ) : !isPending && !session ? (
-            <Link href="/sign-in" className="hidden md:flex">
+            <Link href="/auth/sign-in" className="hidden md:flex">
               <Button
                 className="gap-2 px-4"
                 variant="default"

@@ -2,40 +2,40 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client"
-  runtime  = "bun"
-  output   = "./prisma/generated"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-}
-
-enum UserRole {
-  ADMIN
-  USER
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  role          UserRole  @default(USER)
-  sessions      Session[]
-  accounts      Account[]
+  id                   String    @id @default(cuid())
+  name                 String?
+  email                String
+  emailVerified        Boolean   @default(false)
+  image                String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  role                 String    @default("USER")
+  generationCount      Int       @default(0)
+  generationResetAt     DateTime?
+  subscriptionStatus   String    @default("free")
+  subscriptionId      String?
+
+  sessions             Session[]
+  accounts             Account[]
+  generations          Generation[]
+  subscriptions        Subscription[]
 
   @@unique([email])
-  @@map("user")
 }
 
 model Session {
   id        String   @id @default(cuid())
   expiresAt DateTime
-  token     String
+  token     String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   ipAddress String?
@@ -43,9 +43,7 @@ model Session {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([token])
   @@index([userId])
-  @@map("session")
 }
 
 model Account {
@@ -54,54 +52,77 @@ model Account {
   providerId            String
   userId                String
   user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accessToken           String?   @db.Text
-  refreshToken          String?   @db.Text
-  idToken               String?   @db.Text
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
   accessTokenExpiresAt  DateTime?
   refreshTokenExpiresAt DateTime?
   scope                 String?
-  password              String?   @db.Text
+  password              String?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
   @@index([userId])
-  @@map("account")
 }
 
 model Verification {
   id         String   @id @default(cuid())
   identifier String
-  value      String   @db.Text
+  value      String
   expiresAt  DateTime
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   @@index([identifier])
-  @@map("verification")
 }
 
-enum ProductStatus {
-  DRAFT
-  ACTIVE
-  ARCHIVED
+model Generation {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prompt    String
+  style     String?
+  colors    String?
+  imageUrl  String
+  provider  String
+  metadata  String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Subscription {
+  id                   String   @id @default(cuid())
+  userId               String
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeCustomerId      String?  @unique
+  stripeSubscriptionId String?  @unique
+  stripePriceId        String?
+  status               String   @default("active")
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@index([userId])
 }
 
 model Product {
-  id              String        @id @default(cuid())
+  id              String   @id @default(cuid())
   name            String
-  description     String?       @db.Text
+  description     String?
   sku             String?
   barcode         String?
-  price           Decimal       @db.Decimal(10, 2)
-  discountedPrice Decimal?      @db.Decimal(10, 2)
-  stock           Int           @default(0)
+  price           Float
+  discountedPrice Float?
+  stock           Int      @default(0)
   category        String?
   subCategory     String?
-  status          ProductStatus @default(DRAFT)
-  inStock         Boolean       @default(true)
-  chargeTax       Boolean       @default(false)
-  createdAt       DateTime      @default(now()) @map(name: "created_at")
-  updatedAt       DateTime      @updatedAt @map(name: "updated_at")
-
-  @@map(name: "products")
+  status          String   @default("DRAFT")
+  inStock         Boolean  @default(true)
+  chargeTax       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

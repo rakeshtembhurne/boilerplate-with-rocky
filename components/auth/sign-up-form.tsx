@@ -79,8 +79,7 @@ export function SignUpForm() {
         toast.success("Account created!", {
           description: "Your account has been created successfully.",
         })
-        router.push(searchParams?.get("from") || "/dashboard")
-        setIsLoading(false)
+        window.location.href = searchParams?.get("from") || "/dashboard"
       },
     })
   }
@@ -195,7 +194,7 @@ export function SignUpForm() {
           Already have an account?{" "}
         </span>
         <Link
-          href="/sign-in"
+          href="/auth/sign-in"
           className="font-medium text-primary hover:underline"
         >
           Sign in

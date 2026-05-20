@@ -1,15 +1,20 @@
 import "server-only"
-
 import { cache } from "react"
-import { headers } from "next/headers"
-import { auth } from "@/lib/auth"
+import { cookies } from "next/headers"
 
 export const getCurrentUser = cache(async () => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  })
-  if (!session?.user) {
+  // Read session from cookie (set by client-side login)
+  const cookieStore = await cookies()
+  const sessionCookie = cookieStore.get("brandsome_session")
+  
+  if (!sessionCookie?.value) {
     return undefined
   }
-  return session.user
+  
+  try {
+    const user = JSON.parse(decodeURIComponent(sessionCookie.value))
+    return user
+  } catch {
+    return undefined
+  }
 })
