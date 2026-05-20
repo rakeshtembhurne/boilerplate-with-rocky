@@ -2,15 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useSelectedLayoutSegment } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 
-import { docsConfig } from "@/config/docs";
 import { marketingConfig } from "@/config/marketing";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
-import { DocsSidebarNav } from "@/components/docs/sidebar-nav";
 import { Icons } from "@/components/shared/icons";
 
 import { ModeToggle } from "./mode-toggle";
@@ -18,15 +15,8 @@ import { ModeToggle } from "./mode-toggle";
 export function NavMobile() {
   const { data: session } = useSession();
   const [open, setOpen] = useState(false);
-  const selectedLayout = useSelectedLayoutSegment();
-  const documentation = selectedLayout === "docs";
 
-  const configMap = {
-    docs: docsConfig.mainNav,
-  };
-
-  const links =
-    (selectedLayout && configMap[selectedLayout]) || marketingConfig.mainNav;
+  const links = marketingConfig.mainNav;
 
   // prevent body scroll when modal is open
   useEffect(() => {
@@ -72,20 +62,8 @@ export function NavMobile() {
             </li>
           ))}
 
-          {session ? (
+          {session?.user ? (
             <>
-              {(session as any)?.user?.role === "ADMIN" ? (
-                <li className="py-3">
-                  <Link
-                    href="/admin"
-                    onClick={() => setOpen(false)}
-                    className="flex w-full font-medium capitalize"
-                  >
-                    Admin
-                  </Link>
-                </li>
-              ) : null}
-
               <li className="py-3">
                 <Link
                   href="/dashboard"
@@ -100,7 +78,7 @@ export function NavMobile() {
             <>
               <li className="py-3">
                 <Link
-                  href="/sign-in"
+                  href="/auth/sign-in"
                   onClick={() => setOpen(false)}
                   className="flex w-full font-medium capitalize"
                 >
@@ -110,7 +88,7 @@ export function NavMobile() {
 
               <li className="py-3">
                 <Link
-                  href="/sign-up"
+                  href="/auth/sign-up"
                   onClick={() => setOpen(false)}
                   className="flex w-full font-medium capitalize"
                 >
@@ -120,12 +98,6 @@ export function NavMobile() {
             </>
           )}
         </ul>
-
-        {documentation ? (
-          <div className="mt-8 block md:hidden">
-            <DocsSidebarNav setOpen={setOpen} />
-          </div>
-        ) : null}
 
         <div className="mt-5 flex items-center justify-end space-x-4">
           <Link href={siteConfig.links.github} target="_blank" rel="noreferrer">

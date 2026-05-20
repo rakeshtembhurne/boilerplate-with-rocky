@@ -3,13 +3,11 @@
 import { revalidatePath } from "next/cache"
 import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
-import { UserRole } from "@prisma/client"
-
 import { prisma } from "@/lib/db"
 import { userRoleSchema } from "@/lib/validations/user"
 
 export type FormData = {
-  role: UserRole
+  role: "ADMIN" | "USER"
 }
 
 export async function updateUserRole(userId: string, data: FormData) {

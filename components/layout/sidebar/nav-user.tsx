@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -22,7 +23,12 @@ import { authClient } from "@/lib/auth-client";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const { data: session } = authClient.useSession?.() || { data: null, isLoading: true };
+  const router = useRouter();
+  const { data: session, isPending } = authClient.useSession();
+
+  if (isPending) {
+    return null;
+  }
 
   if (!session?.user) {
     return null;
@@ -38,12 +44,10 @@ export function NavUser() {
         .slice(0, 2)
     : "U";
 
-  const handleSignOut = () => {
-    authClient.signOut({
-      onSuccess: () => {
-        window.location.href = "/";
-      },
-    });
+  const handleSignOut = async () => {
+    await authClient.signOut();
+    router.push("/");
+    router.refresh();
   };
 
   return (
@@ -98,7 +102,7 @@ export function NavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut} className="gap-2">
+            <DropdownMenuItem onClick={handleSignOut} className="gap-2 cursor-pointer">
               <LogOutIcon className="size-4" />
               Log out
             </DropdownMenuItem>

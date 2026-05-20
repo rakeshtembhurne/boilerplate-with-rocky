@@ -9,7 +9,7 @@ export const useSession = _useSession;
 
 // Re-export signOut
 export function signOut(options?: { callbackUrl?: string }) {
-  return _signOut({ callbackUrl: options?.callbackUrl || "/" });
+  return _signOut(options?.callbackUrl || "/");
 }
 
 // Also export the client for direct access

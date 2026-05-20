@@ -4,7 +4,7 @@ import { z } from "zod"
 export const env = createEnv({
   server: {
     // betterAuth configuration
-    BETTER_AUTH_SECRET: z.string().min(32).optional(),
+    BETTER_AUTH_SECRET: z.string().min(1).optional(),
     BETTER_AUTH_URL: z.string().url().optional(),
     AUTH_SECRET: z.string().min(1).optional(),
     NEXTAUTH_URL: z.string().url().optional(),

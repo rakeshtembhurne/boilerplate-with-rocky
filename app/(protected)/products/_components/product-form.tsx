@@ -78,7 +78,7 @@ export default function ProductForm({ product, isEdit = false }: ProductFormProp
       stock: product?.stock?.toString() || "0",
       category: product?.category || "",
       subCategory: product?.subCategory || "",
-      status: product?.status || "DRAFT",
+      status: (product?.status as "DRAFT" | "ACTIVE" | "ARCHIVED") || "DRAFT",
       inStock: product?.inStock ?? true,
       chargeTax: product?.chargeTax ?? false,
     },
