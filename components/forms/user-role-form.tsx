@@ -3,8 +3,7 @@
 import { useState, useTransition } from "react";
 import { updateUserRole, type FormData } from "@/actions/update-user-role";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { User, UserRole } from "@prisma/client";
-import { useSession } from "@/lib/next-auth-compat";
+import { useSession } from "@/lib/auth-client";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -29,23 +28,24 @@ import {
 import { SectionColumns } from "@/components/dashboard/section-columns";
 import { Icons } from "@/components/shared/icons";
 
-interface UserNameFormProps {
-  user: Pick<User, "id" | "role">;
+interface UserRoleFormProps {
+  user: { id: string; role: string };
 }
 
-export function UserRoleForm({ user }: UserNameFormProps) {
+const roles = ["ADMIN", "USER"] as const;
+
+export function UserRoleForm({ user }: UserRoleFormProps) {
   const { data: session } = useSession();
   const [updated, setUpdated] = useState(false);
   const [isPending, startTransition] = useTransition();
   const updateUserRoleWithId = updateUserRole.bind(null, user.id);
 
-  const roles = Object.values(UserRole);
   const [role, setRole] = useState(user.role);
 
   const form = useForm<FormData>({
     resolver: zodResolver(userRoleSchema),
     values: {
-      role: role,
+      role: role as "ADMIN" | "USER",
     },
   });
 
@@ -58,7 +58,6 @@ export function UserRoleForm({ user }: UserNameFormProps) {
           description: "Your role was not updated. Please try again.",
         });
       } else {
-        // betterAuth automatically updates the session atom
         setUpdated(false);
         toast.success("Your role has been updated.");
       }
@@ -85,11 +84,10 @@ export function UserRoleForm({ user }: UserNameFormProps) {
                   <FormItem className="flex-1 space-y-0">
                     <FormLabel className="sr-only">Role</FormLabel>
                     <Select
-                      // TODO:(FIX) Option value not update. Use useState for the moment
-                      onValueChange={(value: UserRole) => {
+                      onValueChange={(value) => {
                         setUpdated(user.role !== value);
                         setRole(value);
-                        // field.onChange;
+                        field.onChange(value);
                       }}
                       name={field.name}
                       defaultValue={user.role}
@@ -100,9 +98,9 @@ export function UserRoleForm({ user }: UserNameFormProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {roles.map((role) => (
-                          <SelectItem key={role} value={role.toString()}>
-                            {role}
+                        {roles.map((r) => (
+                          <SelectItem key={r} value={r}>
+                            {r}
                           </SelectItem>
                         ))}
                       </SelectContent>

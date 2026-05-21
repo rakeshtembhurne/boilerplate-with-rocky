@@ -1,48 +1,16 @@
 /**
- * Compatibility layer for migrating from NextAuth to betterAuth
- * This file re-exports betterAuth client with NextAuth-compatible names
+ * @deprecated Use auth-client instead
+ * Compatibility layer for next-auth imports
  */
+import { authClient, useSession as _useSession, signOut as _signOut } from "./auth-client";
 
-import React from "react"
-import { authClient } from "@/lib/auth-client"
+// Re-export useSession
+export const useSession = _useSession;
 
-// Re-export authClient for backward compatibility
-export { authClient }
-
-// Re-export useSession hook
-export const useSession = authClient.useSession
-
-// Re-export signIn function
-export const signIn = {
-  email: authClient.signIn.email,
-  social: authClient.signIn.social,
+// Re-export signOut
+export function signOut(options?: { callbackUrl?: string }) {
+  return _signOut(options?.callbackUrl || "/");
 }
 
-// Export a function that mimics NextAuth's signIn(provider) signature
-export function signInSocial(provider: string, options?: any) {
-  return authClient.signIn.social({ provider, ...options })
-}
-
-// Backward compatible: allow signIn("google") syntax
-export default function signInCompat(provider?: string, options?: any) {
-  if (!provider) {
-    throw new Error("Provider is required")
-  }
-  if (provider === "email") {
-    return authClient.signIn.email
-  }
-  return authClient.signIn.social({ provider, ...options })
-}
-
-// Re-export signOut function
-export const signOut = (options?: { callbackUrl?: string }) => {
-  return authClient.signOut({
-    fetchOptions: {
-      onSuccess: () => {
-        if (options?.callbackUrl) {
-          window.location.href = options.callbackUrl
-        }
-      },
-    },
-  })
-}
+// Also export the client for direct access
+export { authClient };

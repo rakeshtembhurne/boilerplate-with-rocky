@@ -1,15 +1,21 @@
+/**
+ * Auth Client for Brandsome
+ * Uses better-auth's next-js integration
+ */
 import { createAuthClient } from "better-auth/react"
+import { env } from "@/env.mjs"
 
-// Use the current origin for client-side requests to avoid port conflicts
+// Create auth client with proper configuration
 export const authClient = createAuthClient({
-  baseURL: typeof window !== "undefined"
-    ? window.location.origin
-    : process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+  baseURL: env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
 })
 
-// Export useSession hook - better-auth/react provides this directly
+// Re-export the session hook
 export const useSession = authClient.useSession
 
-// Note: better-auth doesn't provide a SessionProvider component.
-// Session management is handled through the useSession hook in client components.
-// For layout-level session management, use the useSession hook directly in client components.
+// Re-export sign out helper
+export function signOut(callbackUrl: string = "/") {
+  authClient.signOut({
+    query: { callbackUrl },
+  })
+}

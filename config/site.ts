@@ -4,9 +4,9 @@ import { env } from "@/env.mjs";
 const siteUrl = env.NEXT_PUBLIC_APP_URL;
 
 export const siteConfig: SiteConfig = {
-  name: "AI with Rocky",
+  name: "BrandSome",
   description:
-    "Get your project off to an explosive start with Auth & User Roles! Harness the power of Next.js 15, Prisma, Neon, Auth.js v5, Resend, React Email, Shadcn/ui to build your next big thing.",
+    "AI-powered logo generator. Create professional logos for your brand in seconds. Choose from modern, minimal, classic, or playful styles.",
   url: siteUrl,
   ogImage: `${siteUrl}/_static/og.jpg`,
   links: {

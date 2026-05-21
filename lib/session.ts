@@ -1,15 +1,33 @@
 import "server-only"
-
 import { cache } from "react"
-import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
 
 export const getCurrentUser = cache(async () => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  })
-  if (!session?.user) {
+  try {
+    const session = await auth.api.getSession({
+      headers: await getHeaders()
+    })
+    if (!session?.user) {
+      return undefined
+    }
+    return session.user
+  } catch {
     return undefined
   }
-  return session.user
 })
+
+export const getSession = cache(async () => {
+  try {
+    const session = await auth.api.getSession({
+      headers: await getHeaders()
+    })
+    return session
+  } catch {
+    return null
+  }
+})
+
+async function getHeaders() {
+  const { headers } = await import("next/headers")
+  return await headers()
+}

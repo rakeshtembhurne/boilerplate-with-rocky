@@ -1,4 +1,8 @@
-import { UserRole } from "@prisma/client";
+// Simple UserRole enum for dashboard config
+export enum UserRole {
+  ADMIN = "ADMIN",
+  USER = "USER",
+}
 
 import { SidebarNavItem } from "types";
 

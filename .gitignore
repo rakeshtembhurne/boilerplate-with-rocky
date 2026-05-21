@@ -44,3 +44,4 @@ next-env.d.ts
 .contentlayer
 # Podman
 podman volumes/
+/dist/

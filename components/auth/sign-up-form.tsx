@@ -29,74 +29,66 @@ export function SignUpForm() {
   const searchParams = useSearchParams()
   const router = useRouter()
 
-  // Listen for OAuth success messages from popup
-  React.useEffect(() => {
-    const messageListener = (event: MessageEvent) => {
-      if (event.origin !== window.location.origin) return
-
-      if (event.data?.type === 'google-oauth-success') {
-        // Refresh session to get updated user info
-        authClient.getSession().then(() => {
-          // Navigate to dashboard or requested page
-          router.push(searchParams?.get("from") || "/dashboard")
-        })
-        setIsGoogleLoading(false)
-        toast.success("Welcome!", {
-          description: "You have been successfully signed in with Google.",
-        })
-      } else if (event.data?.type === 'google-oauth-error') {
-        setIsGoogleLoading(false)
-        toast.error("Sign in failed", {
-          description: event.data.payload.error?.message || "Your Google sign in request failed.",
-        })
-      }
-    }
-
-    window.addEventListener('message', messageListener)
-    return () => window.removeEventListener('message', messageListener)
-  }, [searchParams, router])
-
   async function onSubmit(data: z.infer<typeof signUpSchema>) {
     setIsLoading(true)
 
-    // Sign up with email, password, and name
-    const result = await authClient.signUp.email({
-      email: data.email.toLowerCase(),
-      password: data.password,
-      name: data.name,
-      callbackURL: searchParams?.get("from") || "/dashboard",
-    }, {
-      onRequest: () => {
-        setIsLoading(true)
-      },
-      onError: (ctx) => {
+    try {
+      // Sign up - better-auth uses sign-up endpoint
+      const result = await authClient.signUp.email({
+        email: data.email.toLowerCase(),
+        password: data.password,
+        name: data.name,
+      })
+
+      if (result.error) {
         toast.error("Sign up failed", {
-          description: ctx.error.message || "Your sign up request failed. Please try again.",
+          description: result.error.message || "Could not create account. Please try again.",
         })
         setIsLoading(false)
-      },
-      onSuccess: () => {
-        toast.success("Account created!", {
-          description: "Your account has been created successfully.",
-        })
-        router.push(searchParams?.get("from") || "/dashboard")
-        setIsLoading(false)
-      },
-    })
+        return
+      }
+
+      toast.success("Account created!", {
+        description: "Your account has been created successfully.",
+      })
+      
+      // Navigate to dashboard
+      router.push("/dashboard")
+      router.refresh()
+    } catch (error) {
+      toast.error("Something went wrong", {
+        description: error instanceof Error ? error.message : "Please try again.",
+      })
+      setIsLoading(false)
+    }
   }
 
   async function onGoogleSignIn() {
     setIsGoogleLoading(true)
 
     try {
-      // Use betterAuth's native social sign-in
-      await authClient.signIn.social({
+      const result = await authClient.signIn.social({
         provider: "google",
         callbackURL: searchParams?.get("from") || "/dashboard",
       })
+
+      if (result?.error) {
+        toast.error("Sign in failed", {
+          description: result.error.message || "Google sign in failed.",
+        })
+        setIsGoogleLoading(false)
+        return
+      }
+
+      toast.success("Welcome!", {
+        description: "You have been successfully signed in with Google.",
+      })
+      
+      const redirectTo = searchParams?.get("from") || "/dashboard"
+      router.push(redirectTo)
     } catch (error) {
-      toast.error("Something went wrong.", {
-        description: error instanceof Error ? error.message : "Your sign in request failed. Please try again.",
+      toast.error("Something went wrong", {
+        description: error instanceof Error ? error.message : "Please try again.",
       })
       setIsGoogleLoading(false)
     }
@@ -156,7 +148,7 @@ export function SignUpForm() {
               </p>
             )}
           </div>
-          <button className={cn(buttonVariants())} disabled={isLoading}>
+          <button type="submit" className={cn(buttonVariants())} disabled={isLoading}>
             {isLoading && (
               <Icons.spinner className="mr-2 size-4 animate-spin" />
             )}
@@ -195,7 +187,7 @@ export function SignUpForm() {
           Already have an account?{" "}
         </span>
         <Link
-          href="/sign-in"
+          href="/auth/sign-in"
           className="font-medium text-primary hover:underline"
         >
           Sign in

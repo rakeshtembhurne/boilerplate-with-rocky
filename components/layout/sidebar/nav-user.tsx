@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -18,11 +19,16 @@ import {
 } from "@/components/ui/sidebar";
 import { BellIcon, CreditCardIcon, LogOutIcon, UserCircle2Icon } from "lucide-react";
 import { DotsVerticalIcon } from "@radix-ui/react-icons";
-import { useSession, signOut } from "@/lib/next-auth-compat";
+import { authClient } from "@/lib/auth-client";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const { data: session } = useSession();
+  const router = useRouter();
+  const { data: session, isPending } = authClient.useSession();
+
+  if (isPending) {
+    return null;
+  }
 
   if (!session?.user) {
     return null;
@@ -37,6 +43,12 @@ export function NavUser() {
         .toUpperCase()
         .slice(0, 2)
     : "U";
+
+  const handleSignOut = async () => {
+    await authClient.signOut();
+    router.push("/");
+    router.refresh();
+  };
 
   return (
     <SidebarMenu>
@@ -90,7 +102,7 @@ export function NavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })} className="gap-2">
+            <DropdownMenuItem onClick={handleSignOut} className="gap-2 cursor-pointer">
               <LogOutIcon className="size-4" />
               Log out
             </DropdownMenuItem>

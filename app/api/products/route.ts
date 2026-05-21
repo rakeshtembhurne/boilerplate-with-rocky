@@ -120,9 +120,9 @@ export async function POST(request: NextRequest) {
         description: validated.description,
         sku: validated.sku,
         barcode: validated.barcode,
-        price: new Prisma.Decimal(validated.price),
+        price: parseFloat(validated.price),
         discountedPrice: validated.discountedPrice
-          ? new Prisma.Decimal(validated.discountedPrice)
+          ? parseFloat(validated.discountedPrice)
           : null,
         stock: parseInt(validated.stock, 10),
         category: validated.category,

@@ -27,12 +27,18 @@
     "podman:logs:app": "podman-compose -f podman/podman-compose.yml logs -f app",
     "podman:logs:db": "podman-compose -f podman/podman-compose.yml logs -f db",
     "podman:ps": "podman-compose -f podman/podman-compose.yml ps",
-    "podman:rebuild": "bun run podman:down && bun run podman:build && bun run podman:up"
+    "podman:rebuild": "bun run podman:down && bun run podman:build && bun run podman:up",
+    "dev:vinext": "vinext dev --port 3001",
+    "build:vinext": "vinext build",
+    "start:vinext": "vinext start"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
+    "@libsql/client": "^0.17.3",
     "@nanostores/react": "^1.0.0",
+    "@prisma/adapter-libsql": "^7.8.0",
     "@prisma/adapter-pg": "^7.2.0",
+    "@prisma/client": "^5.22.0",
     "@radix-ui/react-accessible-icon": "^1.1.0",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",
@@ -86,10 +92,11 @@
     "nextjs-toploader": "^3.9.17",
     "nodemailer": "^6.9.14",
     "pg": "^8.16.3",
+    "prisma": "5.22.0",
     "prop-types": "^15.8.1",
-    "react": "19.2.3",
+    "react": "^19.2.6",
     "react-day-picker": "^8.10.1",
-    "react-dom": "19.2.3",
+    "react-dom": "^19.2.6",
     "react-email": "2.1.5",
     "react-ga4": "^2.1.0",
     "react-hook-form": "^7.52.1",
@@ -108,11 +115,14 @@
     "@commitlint/cli": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.2",
     "@ianvs/prettier-plugin-sort-imports": "^4.3.1",
+    "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4.1.14",
     "@types/node": "^20.14.11",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
     "@typescript-eslint/parser": "^8.46.1",
+    "@vitejs/plugin-react": "^6.0.2",
+    "@vitejs/plugin-rsc": "^0.5.26",
     "autoprefixer": "^10.4.19",
     "baseline-browser-mapping": "^2.9.12",
     "eslint": "^8.57.0",
@@ -125,6 +135,7 @@
     "postcss": "^8.4.39",
     "prettier": "^3.3.3",
     "pretty-quick": "^4.0.0",
+    "react-server-dom-webpack": "^19.2.6",
     "rehype": "^13.0.1",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-pretty-code": "^0.13.2",
@@ -135,10 +146,13 @@
     "tailwindcss": "^4.1.14",
     "tsx": "^4.20.6",
     "typescript": "5.9.3",
-    "unist-util-visit": "^5.0.0"
+    "unist-util-visit": "^5.0.0",
+    "vinext": "^0.0.50",
+    "vite": "^8.0.13"
   },
   "overrides": {
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3"
-  }
+  },
+  "type": "module"
 }
