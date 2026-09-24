@@ -10,6 +10,7 @@
     "lint": "bunx eslint .",
     "preview": "bun --bun next build && bun --bun next start",
     "postinstall": "prisma generate",
+    "prepare": "husky",
     "email": "bun --bun email dev --dir emails --port 3333",
     "db:generate": "bunx --bun prisma generate",
     "db:migrate": "bunx --bun prisma migrate dev && bunx --bun prisma generate",

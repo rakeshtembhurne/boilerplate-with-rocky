@@ -1,6 +1,6 @@
 /**
- * Auth Client for Brandsome
- * Uses better-auth's next-js integration
+ * Auth Client
+ * Uses better-auth's React integration
  */
 import { createAuthClient } from "better-auth/react"
 
