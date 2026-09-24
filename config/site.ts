@@ -1,17 +1,16 @@
 import { SidebarNavItem, SiteConfig } from "types";
-import { env } from "@/env.mjs";
 
-const siteUrl = env.NEXT_PUBLIC_APP_URL;
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 export const siteConfig: SiteConfig = {
-  name: "BrandSome",
+  name: "Acme",
   description:
-    "AI-powered logo generator. Create professional logos for your brand in seconds. Choose from modern, minimal, classic, or playful styles.",
+    "A production-ready Next.js 16 starter with authentication, Turso/libSQL, a pluggable CRUD example, and a full theme system.",
   url: siteUrl,
   ogImage: `${siteUrl}/_static/og.jpg`,
   links: {
-    twitter: "https://twitter.com/tembhurnerakesh",
-    github: "https://github.com/yourusername/your-repo",
+    twitter: "https://twitter.com/your-handle",
+    github: "https://github.com/your-org/your-repo",
   },
   mailSupport: "support@example.com",
   // Theme settings
@@ -31,8 +30,8 @@ export const footerLinks: SidebarNavItem[] = [
     items: [
       { title: "About", href: "#" },
       { title: "Enterprise", href: "#" },
-      { title: "Terms", href: "/terms" },
-      { title: "Privacy", href: "/privacy" },
+      { title: "Terms", href: "#" },
+      { title: "Privacy", href: "#" },
     ],
   },
   {

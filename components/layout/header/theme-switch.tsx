@@ -1,18 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useSyncExternalStore } from "react";
 import { useTheme } from "next-themes";
 import { MoonIcon, SunIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
-export default function ThemeSwitch() {
-  const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
+const emptySubscribe = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+export default function ThemeSwitch() {
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    getClientSnapshot,
+    getServerSnapshot,
+  );
+  const { theme, setTheme } = useTheme();
 
   if (!mounted) {
     return null;
@@ -23,7 +27,8 @@ export default function ThemeSwitch() {
       size="icon"
       variant="ghost"
       className="relative"
-      onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
+      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+    >
       {theme === "light" ? <SunIcon /> : <MoonIcon />}
       <span className="sr-only">Toggle theme</span>
     </Button>

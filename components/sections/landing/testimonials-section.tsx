@@ -28,7 +28,7 @@ export function TestimonialsSection({ data }: TestimonialsSectionProps) {
                 </div>
               </CardHeader>
               <CardContent className="p-6 pt-0 flex-grow sm:p-8 sm:pt-0">
-                <p className="text-muted-foreground text-base leading-relaxed sm:text-lg">"{testimonial.content}"</p>
+                <p className="text-muted-foreground text-base leading-relaxed sm:text-lg">&ldquo;{testimonial.content}&rdquo;</p>
               </CardContent>
               <CardFooter className="p-6 pt-0 sm:p-8 sm:pt-0">
                 <div className="flex items-center gap-3 sm:gap-4">

@@ -1,33 +1,32 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// Prisma schema — Prisma ORM v7 (ESM, rust-free client, driver adapters)
+// Docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "./generated"
 }
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+}
+
+enum UserRole {
+  ADMIN
+  USER
 }
 
 model User {
-  id                   String    @id @default(cuid())
-  name                 String?
-  email                String
-  emailVerified        Boolean   @default(false)
-  image                String?
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
-  role                 String    @default("USER")
-  generationCount      Int       @default(0)
-  generationResetAt     DateTime?
-  subscriptionStatus   String    @default("free")
-  subscriptionId      String?
+  id            String   @id @default(cuid())
+  name          String?
+  email         String
+  emailVerified Boolean  @default(false)
+  image         String?
+  role          UserRole @default(USER)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  sessions             Session[]
-  accounts             Account[]
-  generations          Generation[]
-  subscriptions        Subscription[]
+  sessions Session[]
+  accounts Account[]
 
   @@unique([email])
 }
@@ -76,53 +75,22 @@ model Verification {
   @@index([identifier])
 }
 
-model Generation {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  prompt    String
-  style     String?
-  colors    String?
-  imageUrl  String
-  provider  String
-  metadata  String?
-  createdAt DateTime @default(now())
+enum ItemStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
 
-  @@index([userId])
+model Item {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  status      ItemStatus @default(DRAFT)
+  price       Float      @default(0)
+  quantity    Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
   @@index([createdAt])
-}
-
-model Subscription {
-  id                   String   @id @default(cuid())
-  userId               String
-  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  stripeCustomerId      String?  @unique
-  stripeSubscriptionId String?  @unique
-  stripePriceId        String?
-  status               String   @default("active")
-  currentPeriodStart   DateTime
-  currentPeriodEnd     DateTime
-  cancelAtPeriodEnd    Boolean  @default(false)
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
-
-  @@index([userId])
-}
-
-model Product {
-  id              String   @id @default(cuid())
-  name            String
-  description     String?
-  sku             String?
-  barcode         String?
-  price           Float
-  discountedPrice Float?
-  stock           Int      @default(0)
-  category        String?
-  subCategory     String?
-  status          String   @default("DRAFT")
-  inStock         Boolean  @default(true)
-  chargeTax       Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([status])
 }

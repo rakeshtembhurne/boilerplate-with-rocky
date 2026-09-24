@@ -6,7 +6,7 @@ import Link from "next/link";
 const PLANS = [
   {
     name: "Free",
-    description: "Perfect for trying out BrandSome",
+    description: "Perfect for trying out Acme",
     price: 0,
     features: [
       "5 logo generations per month",
@@ -88,11 +88,11 @@ export default function PricingPage() {
             <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-indigo-600 rounded-lg flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-xl">BrandSome</span>
+            <span className="font-bold text-xl">Acme</span>
           </div>
           
           <nav className="flex items-center gap-6">
-            <a href="/create" className="text-sm text-muted-foreground hover:text-foreground">Create Logo</a>
+            <a href="/auth/sign-up" className="text-sm text-muted-foreground hover:text-foreground">Get started</a>
             <a href="/pricing" className="text-sm font-medium text-violet-600">Pricing</a>
           </nav>
 
@@ -207,7 +207,7 @@ export default function PricingPage() {
               Ready to Create Your Logo?
             </h2>
             <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-              Join thousands of businesses who trust BrandSome for their brand identity.
+              Join thousands of businesses who trust Acme for their brand identity.
             </p>
             <Link href="/auth/signup">
               <Button size="lg" className="text-lg px-8">
@@ -226,7 +226,7 @@ export default function PricingPage() {
                 <div className="w-6 h-6 bg-gradient-to-br from-violet-600 to-indigo-600 rounded flex items-center justify-center">
                   <Sparkles className="w-4 h-4 text-white" />
                 </div>
-                <span className="font-semibold">BrandSome</span>
+                <span className="font-semibold">Acme</span>
               </div>
               
               <div className="flex gap-6 text-sm text-muted-foreground">
@@ -236,7 +236,7 @@ export default function PricingPage() {
               </div>
               
               <p className="text-sm text-muted-foreground">
-                © 2024 BrandSome. All rights reserved.
+                © 2024 Acme. All rights reserved.
               </p>
             </div>
           </div>

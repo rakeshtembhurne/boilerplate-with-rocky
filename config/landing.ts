@@ -26,12 +26,13 @@ export const landingConfig = {
     },
     headline: {
       title: "Build Your AI-Powered App in Minutes, Not Months",
-      subtitle: "The complete Next.js 16 starter kit with authentication, database, and AI integrations. Ship faster with enterprise-grade architecture.",
+      subtitle:
+        "The complete Next.js 16 starter kit with authentication, database, and AI integrations. Ship faster with enterprise-grade architecture.",
     },
     cta: {
       primary: {
         text: "Get Started Free",
-        href: "/sign-up",
+        href: "/auth/sign-up",
         variant: "default" as const,
         size: "lg" as const,
       },
@@ -48,7 +49,7 @@ export const landingConfig = {
     },
     visual: {
       type: "code" as const, // 'code' | 'image' | 'video'
-      content: "// Your app structure\nnpx create-next-app -e ai-starter",
+      content: "// Get started\nbun install && bun run dev",
     },
   },
 
@@ -59,7 +60,8 @@ export const landingConfig = {
     enabled: true,
     logos: {
       title: "Trusted by innovative teams",
-      subtitle: "From startups to enterprises, developers ship faster with AI Starter",
+      subtitle:
+        "From startups to enterprises, developers ship faster with AI Starter",
       companies: [
         { name: "Acme Corp", logo: "🏢" },
         { name: "TechStart", logo: "🚀" },
@@ -90,34 +92,40 @@ export const landingConfig = {
       {
         icon: "⚡",
         title: "Lightning Fast Setup",
-        description: "Get up and running in under 5 minutes with our CLI. No configuration headaches.",
+        description:
+          "Get up and running in under 5 minutes with our CLI. No configuration headaches.",
         badge: "Popular",
       },
       {
         icon: "🔐",
         title: "Enterprise Authentication",
-        description: "Built-in auth with OAuth, magic links, and role-based access control. Secure by default.",
+        description:
+          "Built-in auth with OAuth, magic links, and role-based access control. Secure by default.",
       },
       {
         icon: "🗄️",
         title: "Database Ready",
-        description: "Prisma ORM with PostgreSQL, ready to scale. Migrations, seeding, and type safety included.",
+        description:
+          "Prisma ORM with PostgreSQL, ready to scale. Migrations, seeding, and type safety included.",
       },
       {
         icon: "🎨",
         title: "Beautiful UI Components",
-        description: "50+ pre-built Shadcn/ui components. Dark mode, responsive design, and accessibility included.",
+        description:
+          "50+ pre-built Shadcn/ui components. Dark mode, responsive design, and accessibility included.",
         badge: "New",
       },
       {
         icon: "🤖",
         title: "AI-Native Architecture",
-        description: "Built for AI applications from day one. Vector databases, RAG pipelines, and LLM integrations.",
+        description:
+          "Built for AI applications from day one. Vector databases, RAG pipelines, and LLM integrations.",
       },
       {
         icon: "📱",
         title: "Mobile-First Design",
-        description: "Responsive layouts that work perfectly on any device. Touch-optimized interactions.",
+        description:
+          "Responsive layouts that work perfectly on any device. Touch-optimized interactions.",
       },
     ],
   },
@@ -133,7 +141,8 @@ export const landingConfig = {
     },
     items: [
       {
-        content: "AI Starter saved us months of development time. We went from idea to production in just 3 weeks. The authentication and database setup alone would have taken us 2 weeks.",
+        content:
+          "AI Starter saved us months of development time. We went from idea to production in just 3 weeks. The authentication and database setup alone would have taken us 2 weeks.",
         author: {
           name: "Sarah Chen",
           role: "CTO at TechStart",
@@ -142,7 +151,8 @@ export const landingConfig = {
         rating: 5,
       },
       {
-        content: "The code quality is exceptional. Clean architecture, TypeScript throughout, and the best practices are already implemented. It's like having a senior architect on the team.",
+        content:
+          "The code quality is exceptional. Clean architecture, TypeScript throughout, and the best practices are already implemented. It's like having a senior architect on the team.",
         author: {
           name: "Marcus Johnson",
           role: "Lead Developer at DataFlow",
@@ -151,7 +161,8 @@ export const landingConfig = {
         rating: 5,
       },
       {
-        content: "We've built 4 products on top of AI Starter. Each time, the setup takes minutes instead of days. The ROI is incredible.",
+        content:
+          "We've built 4 products on top of AI Starter. Each time, the setup takes minutes instead of days. The ROI is incredible.",
         author: {
           name: "Emily Rodriguez",
           role: "Founder at CloudBase",
@@ -174,20 +185,22 @@ export const landingConfig = {
     steps: [
       {
         number: "01",
-        title: "Install with CLI",
-        description: "Run a single command to generate your project with all dependencies configured.",
-        code: "npx create-ai-starter my-app",
+        title: "Install dependencies",
+        description: "Clone the repo and install everything with Bun.",
+        code: "bun install",
       },
       {
         number: "02",
         title: "Customize Your App",
-        description: "Modify the config files and add your business logic. Everything is type-safe and well-documented.",
-        code: "cd my-app && npm run dev",
+        description:
+          "Modify the config files and add your business logic. Everything is type-safe and well-documented.",
+        code: "bun run dev",
       },
       {
         number: "03",
         title: "Deploy to Production",
-        description: "Push to your favorite platform. Vercel, Netlify, AWS, or your own infrastructure.",
+        description:
+          "Push to your favorite platform. Vercel, Netlify, AWS, or your own infrastructure.",
         code: "git push origin main",
       },
     ],
@@ -224,7 +237,7 @@ export const landingConfig = {
         ],
         cta: {
           text: "Start Free",
-          href: "/sign-up",
+          href: "/auth/sign-up",
         },
         popular: false,
       },
@@ -246,7 +259,7 @@ export const landingConfig = {
         ],
         cta: {
           text: "Get Started",
-          href: "/sign-up",
+          href: "/auth/sign-up",
         },
         popular: true,
         badge: "Most Popular",
@@ -288,27 +301,33 @@ export const landingConfig = {
     items: [
       {
         question: "How long does it take to set up?",
-        answer: "Most developers are up and running in under 5 minutes. Just run the CLI command, answer a few questions, and you'll have a fully configured Next.js app ready to customize.",
+        answer:
+          "Most developers are up and running in under 5 minutes. Just run the CLI command, answer a few questions, and you'll have a fully configured Next.js app ready to customize.",
       },
       {
         question: "Can I use this for commercial projects?",
-        answer: "Absolutely! AI Starter is released under the MIT license, which means you can use it for personal and commercial projects without any restrictions.",
+        answer:
+          "Absolutely! AI Starter is released under the MIT license, which means you can use it for personal and commercial projects without any restrictions.",
       },
       {
         question: "What's included in the starter kit?",
-        answer: "You get authentication (OAuth, magic links), database (Prisma + PostgreSQL), UI components (50+ Shadcn/ui), email templates, dark mode, responsive design, and much more. Check the documentation for the full feature list.",
+        answer:
+          "You get authentication (OAuth, magic links), database (Prisma + PostgreSQL), UI components (50+ Shadcn/ui), email templates, dark mode, responsive design, and much more. Check the documentation for the full feature list.",
       },
       {
         question: "Do I need to know Next.js?",
-        answer: "Basic React and TypeScript knowledge is recommended. Our comprehensive documentation and video tutorials will help you get started even if you're new to Next.js.",
+        answer:
+          "Basic React and TypeScript knowledge is recommended. Our comprehensive documentation and video tutorials will help you get started even if you're new to Next.js.",
       },
       {
         question: "Can I customize the components?",
-        answer: "Yes! All components are fully customizable. You can modify styles, add features, or replace them entirely. The code is clean and well-documented.",
+        answer:
+          "Yes! All components are fully customizable. You can modify styles, add features, or replace them entirely. The code is clean and well-documented.",
       },
       {
         question: "What kind of support do you offer?",
-        answer: "We have a community Discord for quick questions, GitHub issues for bug reports, and priority support is available for Pro and Enterprise plans.",
+        answer:
+          "We have a community Discord for quick questions, GitHub issues for bug reports, and priority support is available for Pro and Enterprise plans.",
       },
     ],
   },
@@ -327,7 +346,7 @@ export const landingConfig = {
     },
     primary: {
       text: "Start Building Now",
-      href: "/sign-up",
+      href: "/auth/sign-up",
       variant: "default" as const,
       size: "lg" as const,
     },
@@ -347,7 +366,8 @@ export const landingConfig = {
     newsletter: {
       enabled: true,
       title: "Stay Updated",
-      description: "Get the latest features and updates delivered to your inbox",
+      description:
+        "Get the latest features and updates delivered to your inbox",
       placeholder: "Enter your email",
       buttonText: "Subscribe",
     },
@@ -383,7 +403,11 @@ export const landingConfig = {
     social: {
       title: "Connect",
       items: [
-        { label: "Twitter", href: "https://twitter.com/tembhurnerakesh", icon: "𝕏" },
+        {
+          label: "Twitter",
+          href: "https://twitter.com/tembhurnerakesh",
+          icon: "𝕏",
+        },
         { label: "GitHub", href: "https://github.com", icon: "🐙" },
         { label: "Discord", href: "https://discord.gg", icon: "💬" },
         { label: "YouTube", href: "https://youtube.com", icon: "📺" },

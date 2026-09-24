@@ -1,8 +1,6 @@
 import path from "path";
 import { fileURLToPath } from "url";
 
-import("./env.mjs");
-
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 
 /** @type {import('next').NextConfig} */
@@ -34,7 +32,11 @@ const nextConfig = {
       },
     ],
   },
-  serverExternalPackages: ["@prisma/client"],
+  serverExternalPackages: [
+    "@prisma/client",
+    "@prisma/adapter-libsql",
+    "@libsql/client",
+  ],
 };
 
 export default nextConfig;

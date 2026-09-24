@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { Suspense } from "react"
 import { SignInForm } from "@/components/auth/sign-in-form"
 import { Icons } from "@/components/shared/icons"
 import { BrandName } from "@/components/layout/brand-name"
@@ -15,7 +16,9 @@ export default function SignInPage() {
           </Link>
         </div>
 
-        <SignInForm />
+        <Suspense fallback={<div className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />}>
+          <SignInForm />
+        </Suspense>
       </div>
     </div>
   )

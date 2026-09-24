@@ -1,54 +1,86 @@
-import { betterAuth } from "better-auth"
-import { prismaAdapter } from "better-auth/adapters/prisma"
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
 
-import { prisma } from "@/lib/db"
-import { env } from "@/env.mjs"
+import { prisma } from "@/lib/db";
+import {
+  resetPasswordEmail,
+  sendEmail,
+  verifyEmailTemplate,
+} from "@/lib/email";
+import { assertServerEnv, env } from "@/lib/env";
 
-// Helper to get base URL
-function getBaseURL() {
-  if (env.NEXT_PUBLIC_APP_URL) {
-    return env.NEXT_PUBLIC_APP_URL
-  }
-  // In development, use localhost
-  if (process.env.NODE_ENV === "development") {
-    return "http://localhost:3000"
-  }
-  // Fallback for production without explicit URL
-  return "http://localhost:3000"
-}
+assertServerEnv();
+
+const appUrl = env.BETTER_AUTH_URL ?? env.NEXT_PUBLIC_APP_URL;
+
+const trustedOrigins = [
+  env.NEXT_PUBLIC_APP_URL,
+  env.BETTER_AUTH_URL,
+  ...(env.BETTER_AUTH_TRUSTED_ORIGINS?.split(",").map((o) => o.trim()) ?? []),
+].filter((origin): origin is string => Boolean(origin));
 
 export const auth = betterAuth({
-  baseURL: getBaseURL(),
+  baseURL: appUrl,
+  secret: env.BETTER_AUTH_SECRET,
   database: prismaAdapter(prisma, {
     provider: "sqlite",
   }),
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: false, // Disable for easier testing
+    // Off by default; enable with REQUIRE_EMAIL_VERIFICATION=true.
+    requireEmailVerification: env.REQUIRE_EMAIL_VERIFICATION === "true",
+    sendResetPassword: async ({ user, url }) => {
+      await sendEmail({
+        to: user.email,
+        subject: "Reset your password",
+        html: resetPasswordEmail(url),
+      });
+    },
+  },
+  emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      await sendEmail({
+        to: user.email,
+        subject: "Verify your email",
+        html: verifyEmailTemplate(url),
+      });
+    },
+  },
+  user: {
+    additionalFields: {
+      // Exposed on the session; `input: false` blocks clients from setting it.
+      role: {
+        type: "string",
+        required: false,
+        defaultValue: "USER",
+        input: false,
+      },
+    },
   },
   socialProviders: {
-    google: env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET ? {
-      clientId: env.GOOGLE_CLIENT_ID,
-      clientSecret: env.GOOGLE_CLIENT_SECRET,
-    } : undefined,
+    google:
+      env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
+        ? {
+            clientId: env.GOOGLE_CLIENT_ID,
+            clientSecret: env.GOOGLE_CLIENT_SECRET,
+          }
+        : undefined,
   },
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // 1 day
     cookieCache: {
-      enabled: false, // Disable cache in development to avoid stale data
-      maxAge: 5 * 60, // 5 minutes
+      enabled: false,
+      maxAge: 5 * 60,
     },
     strategy: "database",
   },
   advanced: {
-    cookiePrefix: "brandsome",
-    trustedOrigins: [
-      "http://localhost:3000",
-      "http://127.0.0.1:3000",
-    ],
+    cookiePrefix: "nextjs-boilerplate",
+    trustedOrigins,
   },
-})
+});
 
-// Type exports for TypeScript
-export type Session = typeof auth.$Infer.Session
+export type Session = typeof auth.$Infer.Session;

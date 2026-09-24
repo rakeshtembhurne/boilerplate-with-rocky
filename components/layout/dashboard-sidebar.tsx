@@ -1,9 +1,9 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { NavItem, SidebarNavItem } from "@/types";
+import { SidebarNavItem } from "@/types";
 import { Menu, PanelLeftClose, PanelRightClose } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
@@ -50,15 +50,10 @@ export function DashboardSidebar({ links }: DashboardSidebarProps) {
   // }, [isSidebarExpanded]);
 
   const { isTablet } = useMediaQuery();
-  const [isSidebarExpanded, setIsSidebarExpanded] = useState(!isTablet);
+  const [expanded, setExpanded] = useState<boolean | null>(null);
+  const isSidebarExpanded = expanded ?? !isTablet;
 
-  const toggleSidebar = () => {
-    setIsSidebarExpanded(!isSidebarExpanded);
-  };
-
-  useEffect(() => {
-    setIsSidebarExpanded(!isTablet);
-  }, [isTablet]);
+  const toggleSidebar = () => setExpanded(!isSidebarExpanded);
 
   return (
     <TooltipProvider delayDuration={0}>

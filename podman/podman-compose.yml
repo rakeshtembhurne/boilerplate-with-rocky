@@ -1,32 +1,35 @@
+# Self-hosted stack for the Next.js boilerplate.
+#
+# Usage:
+#   cp .env.podman.example .env.podman   # then edit it
+#   bun run podman:build
+#   bun run podman:up
+#
+# The database is Turso/libSQL. Point DATABASE_URL at a Turso database
+# (`libsql://<db>.turso.io`) or mount a local SQLite file on a volume.
+
 services:
   app:
-    image: localhost/ai-starter:latest
+    build:
+      context: ..
+      dockerfile: podman/Containerfile
+    image: nextjs-boilerplate:latest
     ports:
       - "3000:3000"
     env_file:
       - ../.env.podman
-    depends_on:
-      db:
-        condition: service_healthy
-    volumes:
-      - ../public:/app/public
-    restart: unless-stopped
-
-  db:
-    image: docker.io/postgres:18-alpine
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=ai_starter_db
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+      - HOSTNAME=0.0.0.0
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
+      test:
+        [
+          "CMD",
+          "bun",
+          "-e",
+          "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
       timeout: 5s
-      retries: 5
-
-volumes:
-  postgres_data:
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
