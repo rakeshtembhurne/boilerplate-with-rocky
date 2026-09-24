@@ -19,6 +19,8 @@
     "db:reset": "bunx --bun prisma migrate reset --force",
     "format": "bun --bun prettier --write .",
     "type-check": "bun --bun tsc --noEmit",
+    "themes:generate": "bun scripts/generate-themes.ts",
+    "themes:check": "bun scripts/generate-themes.ts --check",
     "podman:up": "podman-compose -f podman/podman-compose.yml up -d",
     "podman:down": "podman-compose -f podman/podman-compose.yml down",
     "podman:build": "podman build -f podman/Containerfile -t nextjs-boilerplate .",

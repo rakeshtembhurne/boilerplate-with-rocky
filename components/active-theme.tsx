@@ -32,7 +32,7 @@ export function ActiveThemeProvider({
   const configDefault = siteConfig.theme?.default || DEFAULT_THEME.preset;
 
   const [theme, setTheme] = useState<ThemeType>(() =>
-    initialTheme ? initialTheme : { ...DEFAULT_THEME, preset: configDefault as ThemeType["preset"] }
+    initialTheme ? initialTheme : { ...DEFAULT_THEME, preset: configDefault }
   );
 
   useEffect(() => {
