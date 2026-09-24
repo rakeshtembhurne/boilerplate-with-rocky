@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { emailOTP } from "better-auth/plugins";
 
 import { prisma } from "@/lib/db";
 import {
@@ -7,6 +8,7 @@ import {
   sendEmail,
   verifyEmailTemplate,
 } from "@/lib/email";
+import { getDevelopmentOtpCode } from "@/lib/email-otp";
 import { assertServerEnv, env } from "@/lib/env";
 
 assertServerEnv();
@@ -48,6 +50,23 @@ export const auth = betterAuth({
       });
     },
   },
+  plugins: [
+    emailOTP({
+      generateOTP: () =>
+        getDevelopmentOtpCode(env.NODE_ENV, env.EMAIL_OTP_TEST_CODE),
+      sendVerificationOTP: async ({ email, otp, type }) => {
+        if (env.NODE_ENV !== "production") {
+          console.info(`[auth] ${type} OTP for ${email}: ${otp}`);
+        }
+
+        await sendEmail({
+          to: email,
+          subject: "Your sign-in code",
+          html: `<p>Use this code to sign in:</p><p><strong>${otp}</strong></p><p>It expires in 5 minutes.</p>`,
+        });
+      },
+    }),
+  ],
   user: {
     additionalFields: {
       // Exposed on the session; `input: false` blocks clients from setting it.

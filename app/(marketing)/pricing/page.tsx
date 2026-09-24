@@ -1,7 +1,15 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Sparkles, Zap, Crown } from "lucide-react";
 import Link from "next/link";
+import { Check, Crown, Sparkles, Zap } from "lucide-react";
+
+import { siteConfig } from "@/config/site";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 const PLANS = [
   {
@@ -15,7 +23,7 @@ const PLANS = [
       "Community support",
     ],
     cta: "Get Started",
-    href: "/auth/signup",
+    href: "/auth/sign-up",
     highlight: false,
   },
   {
@@ -32,7 +40,7 @@ const PLANS = [
       "Priority support",
     ],
     cta: "Start Pro Trial",
-    href: "/auth/signup?plan=pro",
+    href: "/auth/sign-up?plan=pro",
     highlight: true,
     badge: "Most Popular",
   },
@@ -80,168 +88,144 @@ const FAQ = [
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-indigo-600 rounded-lg flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-bold text-xl">Acme</span>
+    <div className="bg-background text-foreground min-h-screen">
+      <section className="bg-muted/30 border-b px-4 py-20 text-center sm:px-6">
+        <div className="mx-auto max-w-3xl">
+          <div className="bg-primary text-primary-foreground shadow-primary/20 mx-auto mb-6 flex size-14 items-center justify-center rounded-2xl">
+            <Sparkles className="size-7" aria-hidden="true" />
           </div>
-          
-          <nav className="flex items-center gap-6">
-            <a href="/auth/sign-up" className="text-sm text-muted-foreground hover:text-foreground">Get started</a>
-            <a href="/pricing" className="text-sm font-medium text-violet-600">Pricing</a>
-          </nav>
-
-          <div className="flex items-center gap-4">
-            <Link href="/auth/signin">
-              <Button variant="ghost">Sign In</Button>
+          <p className="text-primary mb-4 text-sm font-medium">
+            Simple, transparent pricing
+          </p>
+          <h1 className="text-4xl font-bold tracking-tight text-balance md:text-6xl">
+            Start free. Scale when you are ready.
+          </h1>
+          <p className="text-muted-foreground mx-auto mt-6 max-w-2xl text-lg leading-8 md:text-xl">
+            Choose the plan that fits your workflow. Upgrade when you need more,
+            with no hidden fees and cancellation anytime.
+          </p>
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link href="/auth/sign-up">
+              <Button size="lg" className="w-full sm:w-auto">
+                Get started free
+              </Button>
             </Link>
-            <Link href="/auth/signup">
-              <Button>Get Started</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main>
-        {/* Hero */}
-        <section className="py-20 text-center">
-          <div className="container mx-auto px-4">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
-              Simple, Transparent Pricing
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Start free. Upgrade when you need more. No hidden fees, cancel anytime.
-            </p>
-          </div>
-        </section>
-
-        {/* Plans */}
-        <section className="pb-20">
-          <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {PLANS.map((plan) => (
-                <Card 
-                  key={plan.name}
-                  className={`relative ${
-                    plan.highlight 
-                      ? "border-violet-500 shadow-lg shadow-violet-100" 
-                      : ""
-                  }`}
-                >
-                  {plan.badge && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="bg-violet-600 text-white text-xs font-medium px-3 py-1 rounded-full">
-                        {plan.badge}
-                      </span>
-                    </div>
-                  )}
-                  
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      {plan.name === "Pro" && <Crown className="w-5 h-5 text-amber-500" />}
-                      {plan.name}
-                    </CardTitle>
-                    <CardDescription>{plan.description}</CardDescription>
-                  </CardHeader>
-                  
-                  <CardContent>
-                    <div className="mb-6">
-                      <span className="text-4xl font-bold">${plan.price}</span>
-                      {plan.price > 0 && (
-                        <span className="text-muted-foreground">/month</span>
-                      )}
-                    </div>
-                    
-                    <ul className="space-y-3 mb-6">
-                      {plan.features.map((feature) => (
-                        <li key={feature} className="flex items-start gap-2">
-                          <Check className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
-                          <span className="text-sm">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    
-                    <Link href={plan.href} className="block">
-                      <Button 
-                        className="w-full" 
-                        variant={plan.highlight ? "default" : "outline"}
-                        size="lg"
-                      >
-                        {plan.cta}
-                      </Button>
-                    </Link>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* FAQ */}
-        <section className="py-20 bg-slate-50">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12">
-              Frequently Asked Questions
-            </h2>
-            
-            <div className="max-w-3xl mx-auto space-y-8">
-              {FAQ.map((item) => (
-                <div key={item.q}>
-                  <h3 className="font-semibold text-lg mb-2">{item.q}</h3>
-                  <p className="text-muted-foreground">{item.a}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section className="py-20">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold mb-4">
-              Ready to Create Your Logo?
-            </h2>
-            <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-              Join thousands of businesses who trust Acme for their brand identity.
-            </p>
-            <Link href="/auth/signup">
-              <Button size="lg" className="text-lg px-8">
-                <Zap className="w-5 h-5 mr-2" />
-                Get Started Free
+            <Link href="/auth/sign-in">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                Sign in
               </Button>
             </Link>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Footer */}
-        <footer className="border-t py-12">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-gradient-to-br from-violet-600 to-indigo-600 rounded flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-white" />
+      <section className="px-4 py-20 sm:px-6">
+        <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
+          {PLANS.map((plan) => (
+            <Card
+              key={plan.name}
+              className={`relative flex flex-col ${
+                plan.highlight
+                  ? "border-primary shadow-primary/10 shadow-lg"
+                  : ""
+              }`}
+            >
+              {plan.badge ? (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <span className="bg-primary text-primary-foreground rounded-full px-3 py-1 text-xs font-medium">
+                    {plan.badge}
+                  </span>
                 </div>
-                <span className="font-semibold">Acme</span>
-              </div>
-              
-              <div className="flex gap-6 text-sm text-muted-foreground">
-                <a href="/privacy">Privacy</a>
-                <a href="/terms">Terms</a>
-                <a href="/contact">Contact</a>
-              </div>
-              
-              <p className="text-sm text-muted-foreground">
-                © 2024 Acme. All rights reserved.
-              </p>
-            </div>
+              ) : null}
+
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  {plan.name === "Pro" ? (
+                    <Crown className="text-primary size-5" aria-hidden="true" />
+                  ) : null}
+                  {plan.name}
+                </CardTitle>
+                <CardDescription>{plan.description}</CardDescription>
+              </CardHeader>
+
+              <CardContent className="flex flex-1 flex-col">
+                <div className="mb-6 flex items-baseline gap-1">
+                  <span className="text-4xl font-bold">${plan.price}</span>
+                  {plan.price > 0 ? (
+                    <span className="text-muted-foreground text-sm">
+                      /month
+                    </span>
+                  ) : null}
+                </div>
+
+                <ul className="mb-8 flex-1 space-y-3">
+                  {plan.features.map((feature) => (
+                    <li
+                      key={feature}
+                      className="flex items-start gap-2 text-sm"
+                    >
+                      <Check
+                        className="text-primary mt-0.5 size-4 shrink-0"
+                        aria-hidden="true"
+                      />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Link href={plan.href} className="block">
+                  <Button
+                    className="w-full"
+                    variant={plan.highlight ? "default" : "outline"}
+                    size="lg"
+                  >
+                    {plan.cta}
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      <section className="bg-muted/30 border-y px-4 py-20 sm:px-6">
+        <div className="mx-auto max-w-3xl">
+          <div className="mb-10 text-center">
+            <h2 className="text-3xl font-bold tracking-tight">
+              Frequently asked questions
+            </h2>
+            <p className="text-muted-foreground mt-3">
+              Everything you need to know before you start.
+            </p>
           </div>
-        </footer>
-      </main>
+          <div className="space-y-8">
+            {FAQ.map((item) => (
+              <div key={item.q}>
+                <h3 className="text-lg font-semibold">{item.q}</h3>
+                <p className="text-muted-foreground mt-2 leading-7">{item.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-20 text-center sm:px-6">
+        <div className="mx-auto max-w-xl">
+          <h2 className="text-3xl font-bold tracking-tight">
+            Ready to create your next logo?
+          </h2>
+          <p className="text-muted-foreground mt-4">
+            Join businesses using {siteConfig.name} to build a clearer brand
+            identity.
+          </p>
+          <Link href="/auth/sign-up" className="mt-8 inline-block">
+            <Button size="lg">
+              <Zap className="mr-2 size-5" aria-hidden="true" />
+              Get started free
+            </Button>
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }

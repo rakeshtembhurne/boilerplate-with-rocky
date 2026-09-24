@@ -20,16 +20,17 @@ export default async function HeroLanding() {
           <span className="mr-3">🎉</span> Powered by {siteConfig.name}
         </Link>
 
-        <h1 className="text-balance font-satoshi text-4xl font-black leading-tight tracking-tight sm:text-5xl md:text-6xl">
+        <h1 className="font-sans text-4xl leading-tight font-black tracking-tight text-balance sm:text-5xl md:text-6xl">
           Next.js Template with{" "}
-          <span className="bg-gradient-to-r from-primary via-primary to-primary bg-clip-text text-transparent">
+          <span className="from-primary via-primary to-primary bg-gradient-to-r bg-clip-text text-transparent">
             Auth & User Roles!
           </span>
         </h1>
 
-        <p className="max-w-2xl text-balance text-base text-muted-foreground sm:text-lg">
+        <p className="text-muted-foreground max-w-2xl text-base text-balance sm:text-lg">
           Minimalist. Sturdy. <strong>Open Source</strong>.
-          <br className="hidden sm:inline" /> Focus on your own idea and... Nothing else!
+          <br className="hidden sm:inline" /> Focus on your own idea and...
+          Nothing else!
         </p>
 
         <div className="flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">

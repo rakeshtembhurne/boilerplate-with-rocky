@@ -232,9 +232,9 @@ export const THEME_PRESETS: ThemePreset[] = [
     "name": "Green",
     "value": "green",
     "colors": [
-      "oklch(0.646 0.222 142.50)",
+      "oklch(0.646 0.222 142.5)",
       "oklch(0.961 0.012 285.82)",
-      "oklch(0.646 0.222 142.50)",
+      "oklch(0.646 0.222 142.5)",
       "oklch(0.464 0 0)"
     ]
   },
@@ -262,9 +262,9 @@ export const THEME_PRESETS: ThemePreset[] = [
     "name": "Lime",
     "value": "lime",
     "colors": [
-      "oklch(0.768 0.189 142.50)",
+      "oklch(0.768 0.189 142.5)",
       "oklch(0.961 0.012 285.82)",
-      "oklch(0.768 0.189 142.50)",
+      "oklch(0.768 0.189 142.5)",
       "oklch(0.464 0 0)"
     ]
   },
@@ -282,10 +282,20 @@ export const THEME_PRESETS: ThemePreset[] = [
     "name": "Mocha Mousse",
     "value": "mocha-mousse",
     "colors": [
-      "#A37764",
-      "#E4C7B8",
-      "#A37764",
-      "#8A655A"
+      "#a37764",
+      "#e4c7b8",
+      "#a37764",
+      "#8a655a"
+    ]
+  },
+  {
+    "name": "Modern Minimal",
+    "value": "modern-minimal",
+    "colors": [
+      "#3b82f6",
+      "#e0f2fe",
+      "#3b82f6",
+      "#2563eb"
     ]
   },
   {
@@ -449,6 +459,16 @@ export const THEME_PRESETS: ThemePreset[] = [
     ]
   },
   {
+    "name": "Sage Garden",
+    "value": "sage-garden",
+    "colors": [
+      "#7c9082",
+      "#bfc9bb",
+      "#7c9082",
+      "#a0aa88"
+    ]
+  },
+  {
     "name": "Sky",
     "value": "sky",
     "colors": [
@@ -482,10 +502,10 @@ export const THEME_PRESETS: ThemePreset[] = [
     "name": "Solar Dusk",
     "value": "solar-dusk",
     "colors": [
-      "#B45309",
+      "#b45309",
       "#f2daba",
-      "#B45309",
-      "#78716C"
+      "#b45309",
+      "#78716c"
     ]
   },
   {
@@ -563,7 +583,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     "value": "twitter",
     "colors": [
       "#1e9df1",
-      "#E3ECF6",
+      "#e3ecf6",
       "#1e9df1",
       "#00b87a"
     ]

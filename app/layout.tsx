@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { ThemeProvider } from "next-themes";
 import NextTopLoader from "nextjs-toploader";
 
+import { siteConfig } from "@/config/site";
 import { DEFAULT_THEME, type ThemeType } from "@/lib/themes";
 import { cn, constructMetadata } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
@@ -23,7 +24,10 @@ export const metadata: Metadata = constructMetadata();
 export default async function RootLayout({ children }: RootLayoutProps) {
   const cookieStore = await cookies();
   const themeSettings = {
-    preset: cookieStore.get("theme_preset")?.value ?? DEFAULT_THEME.preset,
+    preset:
+      cookieStore.get("theme_preset")?.value ??
+      siteConfig.theme?.default ??
+      DEFAULT_THEME.preset,
     scale: cookieStore.get("theme_scale")?.value ?? DEFAULT_THEME.scale,
     radius: cookieStore.get("theme_radius")?.value ?? DEFAULT_THEME.radius,
     contentLayout:
