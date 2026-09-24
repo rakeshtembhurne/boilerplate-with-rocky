@@ -289,6 +289,16 @@ export const THEME_PRESETS: ThemePreset[] = [
     ]
   },
   {
+    "name": "Modern Minimal",
+    "value": "modern-minimal",
+    "colors": [
+      "#3b82f6",
+      "#e0f2fe",
+      "#3b82f6",
+      "#2563eb"
+    ]
+  },
+  {
     "name": "Mono",
     "value": "mono",
     "colors": [
@@ -446,6 +456,16 @@ export const THEME_PRESETS: ThemePreset[] = [
       "oklch(0.961 0.012 285.82)",
       "oklch(0.683 0.248 12.23)",
       "oklch(0.464 0 0)"
+    ]
+  },
+  {
+    "name": "Sage Garden",
+    "value": "sage-garden",
+    "colors": [
+      "#7c9082",
+      "#bfc9bb",
+      "#7c9082",
+      "#a0aa88"
     ]
   },
   {

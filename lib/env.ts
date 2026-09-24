@@ -35,6 +35,10 @@ const envSchema = z.object({
   // Email
   RESEND_API_KEY: z.string().min(1).optional(),
   FROM_EMAIL: z.string().email().optional(),
+  EMAIL_OTP_TEST_CODE: z
+    .string()
+    .regex(/^\d{6}$/)
+    .optional(),
   REQUIRE_EMAIL_VERIFICATION: z.enum(["true", "false"]).optional(),
 
   // AI providers
