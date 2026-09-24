@@ -4,7 +4,7 @@
  * For production: Configure INFERENCE_SH_API_KEY or use OpenRouter multimodal models
  */
 
-import { env } from "@/env.mjs"
+import { env } from "@/lib/env"
 
 export interface LogoGenerationParams {
   prompt: string;

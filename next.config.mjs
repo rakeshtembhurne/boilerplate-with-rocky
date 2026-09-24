@@ -1,8 +1,6 @@
 import path from "path";
 import { fileURLToPath } from "url";
 
-import("./env.mjs");
-
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 
 /** @type {import('next').NextConfig} */

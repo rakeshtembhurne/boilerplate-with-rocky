@@ -1,7 +1,6 @@
 import { SidebarNavItem, SiteConfig } from "types";
-import { env } from "@/env.mjs";
 
-const siteUrl = env.NEXT_PUBLIC_APP_URL;
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 export const siteConfig: SiteConfig = {
   name: "BrandSome",

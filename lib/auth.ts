@@ -2,7 +2,9 @@ import { betterAuth } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 
 import { prisma } from "@/lib/db"
-import { env } from "@/env.mjs"
+import { assertServerEnv, env } from "@/lib/env"
+
+assertServerEnv()
 
 // Helper to get base URL
 function getBaseURL() {

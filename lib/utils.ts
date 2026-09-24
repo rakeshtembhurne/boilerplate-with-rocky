@@ -3,7 +3,7 @@ import { clsx, type ClassValue } from "clsx";
 import ms from "ms";
 import { twMerge } from "tailwind-merge";
 
-import { env } from "@/env.mjs";
+import { env } from "@/lib/env";
 import { siteConfig } from "@/config/site";
 
 export function cn(...inputs: ClassValue[]) {
