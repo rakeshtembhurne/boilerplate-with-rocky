@@ -1,116 +1,93 @@
 "use client"
 
 import * as React from "react"
-import { useSearchParams, useRouter } from "next/navigation"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
-import { toast } from "sonner"
-import { Icons } from "@/components/shared/icons"
-import { authClient } from "@/lib/auth-client"
 import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
+import { toast } from "sonner"
+
+import { authClient } from "@/lib/auth-client"
+import { buttonVariants } from "@/components/ui/button"
+import { Icons } from "@/components/shared/icons"
+import { cn } from "@/lib/utils"
+
+type Status = "idle" | "loading" | "success" | "error"
 
 export function VerifyEmailForm() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
-  const [token, setToken] = React.useState<string | null>(null)
+  const token = searchParams.get("token")
+
+  const [status, setStatus] = React.useState<Status>("idle")
+  const [message, setMessage] = React.useState("")
 
   React.useEffect(() => {
-    // Get token from URL
-    const tokenParam = searchParams.get("token")
-    if (tokenParam) {
-      setToken(tokenParam)
-    } else {
-      // Try to get token from path
-      const pathParts = window.location.pathname.split("/")
-      const pathToken = pathParts[pathParts.length - 1]
-      if (pathToken && pathToken !== "verify-email") {
-        setToken(pathToken)
-      }
-    }
-  }, [searchParams])
-
-  async function verifyEmail() {
     if (!token) {
-      toast.error("Invalid verification link")
+      setStatus("error")
+      setMessage("The verification link is invalid or has expired.")
       return
     }
 
-    setIsLoading(true)
+    let active = true
+    setStatus("loading")
 
-    try {
-      // TODO: better-auth v2 API - implement verify email
-      // const result = await authClient.verifyEmail({
-      //   query: { token },
-      // })
-
-      toast.success("Email verified successfully", {
-        description: "Your email has been verified. You can now sign in.",
+    authClient
+      .verifyEmail({ query: { token } })
+      .then(({ error }) => {
+        if (!active) return
+        if (error) {
+          setStatus("error")
+          setMessage(error.message ?? "Verification failed.")
+        } else {
+          setStatus("success")
+          toast.success("Email verified successfully")
+          setTimeout(() => router.push("/auth/sign-in"), 1500)
+        }
       })
-      router.push("/sign-in")
-    } catch (error) {
-      toast.error("Something went wrong", {
-        description: error instanceof Error ? error.message : "Failed to verify email",
+      .catch(() => {
+        if (!active) return
+        setStatus("error")
+        setMessage("Verification failed.")
       })
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
-  React.useEffect(() => {
-    if (token) {
-      verifyEmail()
+    return () => {
+      active = false
     }
-  }, [token])
-
-  if (!token) {
-    return (
-      <div className="flex flex-col space-y-4">
-        <div className="flex flex-col space-y-2 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight text-red-600">
-            Invalid Verification Link
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            The email verification link is invalid or has expired.
-          </p>
-        </div>
-      </div>
-    )
-  }
+  }, [token, router])
 
   return (
     <div className="flex flex-col space-y-4">
       <div className="flex flex-col space-y-2 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Verifying your email
+        <h1
+          className={cn(
+            "text-2xl font-semibold tracking-tight",
+            status === "error" && "text-red-600",
+          )}
+        >
+          {status === "error"
+            ? "Invalid Verification Link"
+            : status === "success"
+              ? "Email verified"
+              : "Verifying your email"}
         </h1>
         <p className="text-sm text-muted-foreground">
-          Please wait while we verify your email address.
+          {status === "error"
+            ? message
+            : status === "success"
+              ? "Redirecting you to sign in…"
+              : "Please wait while we verify your email address."}
         </p>
       </div>
 
-      <div className="flex justify-center">
-        {isLoading && (
-          <Icons.spinner className="h-8 w-8 animate-spin" />
-        )}
-      </div>
-
-      {!isLoading && (
-        <div className="text-center text-sm">
-          <span className="text-muted-foreground">
-            Didn&apos;t receive the email?{" "}
-          </span>
-          <Link
-            href="/sign-in"
-            className="font-medium text-primary hover:underline"
-          >
-            Try signing in
-          </Link>
+      {status === "loading" && (
+        <div className="flex justify-center">
+          <Icons.spinner className="size-8 animate-spin" />
         </div>
+      )}
+
+      {status === "error" && (
+        <Link href="/auth/sign-in" className={cn(buttonVariants())}>
+          Back to sign in
+        </Link>
       )}
     </div>
   )

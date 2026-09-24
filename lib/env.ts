@@ -16,12 +16,13 @@ const envSchema = z.object({
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().min(1).optional(),
 
   // Database (Turso libSQL, or a local SQLite file)
-  DATABASE_URL: z.string().min(1).default("file:./dev.db"),
+  DATABASE_URL: z.string().min(1).default("file:./prisma/dev.db"),
   DATABASE_AUTH_TOKEN: z.string().min(1).optional(),
 
   // Auth (better-auth)
   BETTER_AUTH_SECRET: z.string().min(1).optional(),
   BETTER_AUTH_URL: z.string().url().optional(),
+  BETTER_AUTH_TRUSTED_ORIGINS: z.string().optional(),
   AUTH_SECRET: z.string().min(1).optional(),
   NEXTAUTH_URL: z.string().url().optional(),
 
@@ -46,7 +47,15 @@ const envSchema = z.object({
   STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
 });
 
-const parsed = envSchema.safeParse(process.env);
+// Treat empty strings as unset so optional vars behave as optional.
+const rawEnv = Object.fromEntries(
+  Object.entries(process.env).map(([key, value]) => [
+    key,
+    value === "" ? undefined : value,
+  ]),
+);
+
+const parsed = envSchema.safeParse(rawEnv);
 
 // `next build` must succeed without secrets; runtime validation still applies.
 const isBuildPhase = process.env.NEXT_PHASE === "phase-production-build";
@@ -59,7 +68,7 @@ if (!parsed.success && !isBuildPhase) {
 }
 
 export const env = (
-  parsed.success ? parsed.data : envSchema.partial().parse(process.env)
+  parsed.success ? parsed.data : envSchema.partial().parse(rawEnv)
 ) as z.infer<typeof envSchema>;
 
 /** Fail loudly when production-critical secrets are missing. */

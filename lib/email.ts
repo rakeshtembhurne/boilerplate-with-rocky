@@ -2,43 +2,36 @@ import { Resend } from "resend";
 
 import { env } from "@/lib/env";
 
-export const resend = new Resend(env.RESEND_API_KEY);
+const resend = env.RESEND_API_KEY ? new Resend(env.RESEND_API_KEY) : null;
 
-// TODO: Update sendVerificationRequest for use react-email with resend magic-link
+const from = env.FROM_EMAIL ?? "onboarding@resend.dev";
 
-// Email({
-//   sendVerificationRequest: async ({ identifier, url, provider }) => {
-//     const user = await getUserByEmail(identifier);
-//     if (!user || !user.name) return null;
+export async function sendEmail({
+  to,
+  subject,
+  html,
+}: {
+  to: string;
+  subject: string;
+  html: string;
+}) {
+  if (!resend) {
+    console.warn(
+      `[email] RESEND_API_KEY is not set — skipped "${subject}" to ${to}`,
+    );
+    return { skipped: true as const };
+  }
 
-//     const userVerified = user?.emailVerified ? true : false;
-//     const authSubject = userVerified ? `Sign-in link for ${siteConfig.name}` : "Activate your account";
+  const { error } = await resend.emails.send({ from, to, subject, html });
+  if (error) throw new Error(error.message);
 
-//     try {
-//       const { data, error } = await resend.emails.send({
-//         from: 'Next Template App <onboarding@resend.dev>',
-//         to: process.env.NODE_ENV === "development" ? 'delivered@resend.dev' : identifier,
-//         subject: authSubject,
-//         react: MagicLinkEmail({
-//           firstName: user?.name as string,
-//           actionUrl: url,
-//           mailType: userVerified ? "login" : "register",
-//           siteName: siteConfig.name
-//         }),
-//         // Set this to prevent Gmail from threading emails.
-//         // More info: https://resend.com/changelog/custom-email-headers
-//         headers: {
-//           'X-Entity-Ref-ID': new Date().getTime() + "",
-//         },
-//       });
+  return { skipped: false as const };
+}
 
-//       if (error || !data) {
-//         throw new Error(error?.message)
-//       }
+export function resetPasswordEmail(url: string) {
+  return `<p>Click the link below to reset your password:</p><p><a href="${url}">Reset password</a></p>`;
+}
 
-//       // console.log(data)
-//     } catch (error) {
-//       throw new Error("Failed to send verification email.")
-//     }
-//   },
-// }),
+export function verifyEmailTemplate(url: string) {
+  return `<p>Click the link below to verify your email address:</p><p><a href="${url}">Verify email</a></p>`;
+}

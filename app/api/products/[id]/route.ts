@@ -3,7 +3,7 @@ import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db";
 import { productSchema } from "@/products/_validations/product";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/prisma/generated/client";
 import { successResponse, ErrorResponses } from "@/products/_lib/api-response";
 
 // GET /api/products/[id] - Get a single product

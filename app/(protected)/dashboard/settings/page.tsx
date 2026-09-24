@@ -1,16 +1,14 @@
 import { redirect } from "next/navigation";
 
 import { getCurrentUser } from "@/lib/session";
-import { prisma } from "@/lib/db";
 import { constructMetadata } from "@/lib/utils";
 import { DeleteAccountSection } from "@/components/dashboard/delete-account";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { UserNameForm } from "@/components/forms/user-name-form";
-import { UserRoleForm } from "@/components/forms/user-role-form";
 import { PasswordForm } from "@/components/forms/user-password-form";
 
 export const metadata = constructMetadata({
-  title: "Settings – Next Template",
+  title: "Settings",
   description: "Configure your account and website settings.",
 });
 
@@ -18,12 +16,6 @@ export default async function SettingsPage() {
   const user = await getCurrentUser();
 
   if (!user?.id) redirect("/auth/sign-in");
-
-  // Fetch user with role from database
-  const dbUser = await prisma.user.findUnique({
-    where: { id: user.id },
-    select: { role: true },
-  });
 
   return (
     <>
@@ -34,7 +26,6 @@ export default async function SettingsPage() {
       <div className="grid gap-6 pb-10">
         <UserNameForm user={{ id: user.id, name: user.name || "" }} />
         <PasswordForm />
-        <UserRoleForm user={{ id: user.id, role: dbUser?.role || "USER" }} />
         <DeleteAccountSection />
       </div>
     </>

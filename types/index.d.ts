@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@/prisma/generated/client";
 
 import { Icons } from "@/components/shared/icons";
 

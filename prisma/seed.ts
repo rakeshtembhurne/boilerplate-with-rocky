@@ -1,6 +1,13 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaLibSql } from "@prisma/adapter-libsql";
 
-const prisma = new PrismaClient();
+import { Prisma, PrismaClient } from "@/prisma/generated/client";
+
+const adapter = new PrismaLibSql({
+  url: process.env.DATABASE_URL ?? "file:./prisma/dev.db",
+  authToken: process.env.DATABASE_AUTH_TOKEN,
+});
+
+const prisma = new PrismaClient({ adapter });
 
 const categories = [
   "Electronics",

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/prisma/generated/client";
 import type { Product } from "../_types";
 
 interface GetProductsParams {

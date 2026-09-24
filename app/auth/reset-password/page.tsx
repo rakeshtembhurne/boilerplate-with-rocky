@@ -1,10 +1,10 @@
 import Link from "next/link"
 import { Suspense } from "react"
-import { SignInForm } from "@/components/auth/sign-in-form"
+import { ResetPasswordForm } from "@/components/auth/reset-password-form"
 import { Icons } from "@/components/shared/icons"
 import { BrandName } from "@/components/layout/brand-name"
 
-export default function SignInPage() {
+export default function ResetPasswordPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
       <div className="container mx-auto flex flex-col items-center justify-center space-y-6 text-center">
@@ -17,7 +17,7 @@ export default function SignInPage() {
         </div>
 
         <Suspense fallback={<div className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />}>
-          <SignInForm />
+          <ResetPasswordForm />
         </Suspense>
       </div>
     </div>

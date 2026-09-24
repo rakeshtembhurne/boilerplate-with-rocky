@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { useSearchParams } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -35,18 +34,25 @@ export function ForgotPasswordForm() {
     setIsLoading(true)
 
     try {
-      // TODO: better-auth v2 API - implement forgot password
-      // const result = await authClient.forgotPassword({
-      //   email: data.email,
-      //   redirectTo: "/auth/reset-password",
-      // })
+      const { error } = await authClient.requestPasswordReset({
+        email: data.email,
+        redirectTo: "/auth/reset-password",
+      })
+
+      if (error) {
+        toast.error("Something went wrong", {
+          description: error.message ?? "Failed to send reset email",
+        })
+        return
+      }
 
       toast.success("Reset email sent", {
         description: "Please check your email for a password reset link.",
       })
     } catch (error) {
       toast.error("Something went wrong", {
-        description: error instanceof Error ? error.message : "Failed to send reset email",
+        description:
+          error instanceof Error ? error.message : "Failed to send reset email",
       })
     } finally {
       setIsLoading(false)
