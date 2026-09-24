@@ -4,6 +4,7 @@ import Link from "next/link";
 import { footerLinks, siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
 import { ModeToggle } from "@/components/layout/mode-toggle";
+import { CopyrightYear } from "@/components/layout/copyright-year";
 
 import { NewsletterForm } from "../forms/newsletter-form";
 import { Icons } from "../shared/icons";
@@ -42,7 +43,7 @@ export function SiteFooter({ className }: React.HTMLAttributes<HTMLElement>) {
             Copyright &copy; 2024. All rights reserved.
           </span> */}
           <p className="text-left text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
+            &copy; <CopyrightYear /> {siteConfig.name}. All rights reserved.
           </p>
 
           <div className="flex items-center gap-3">

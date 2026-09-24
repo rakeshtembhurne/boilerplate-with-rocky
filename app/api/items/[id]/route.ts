@@ -5,8 +5,6 @@ import { getCurrentUser } from "@/lib/session";
 import { deleteItem, getItem, updateItem } from "@/items/_lib/server-api";
 import { itemSchema } from "@/items/_validations/item";
 
-export const dynamic = "force-dynamic";
-
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function GET(_request: NextRequest, { params }: RouteContext) {

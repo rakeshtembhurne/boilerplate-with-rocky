@@ -3,8 +3,6 @@ import { ImageResponse } from "next/og";
 import { siteConfig } from "@/config/site";
 import { ogImageSchema } from "@/lib/validations/og";
 
-export const runtime = "nodejs";
-
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);

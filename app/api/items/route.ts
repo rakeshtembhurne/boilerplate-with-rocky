@@ -6,8 +6,6 @@ import { createItem, getItems } from "@/items/_lib/server-api";
 import type { ItemStatus } from "@/items/_types";
 import { itemSchema } from "@/items/_validations/item";
 
-export const dynamic = "force-dynamic";
-
 export async function GET(request: NextRequest) {
   const user = await getCurrentUser();
   if (!user) return fail("Unauthorized", 401);
