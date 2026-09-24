@@ -13,8 +13,8 @@ export const authClient = createAuthClient({
 export const useSession = authClient.useSession
 
 // Re-export sign out helper
-export function signOut(callbackUrl: string = "/") {
-  authClient.signOut({
-    callbackURL: callbackUrl,
+export function signOut(options?: { callbackUrl?: string }) {
+  return authClient.signOut({
+    callbackURL: options?.callbackUrl ?? "/",
   })
 }

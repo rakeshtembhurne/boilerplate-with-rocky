@@ -13,6 +13,15 @@ const eslintConfig = defineConfig([
       "react/jsx-key": "off",
     },
   },
+  {
+    // shadcn/ui primitives are generated code; relax rules they routinely trip.
+    files: ["components/ui/**/*.tsx"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
+      "react-hooks/purity": "off",
+    },
+  },
   globalIgnores([
     ".next/**",
     "out/**",

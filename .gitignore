@@ -41,7 +41,15 @@ next-env.d.ts
 /.react-email/
 
 .vscode
-.contentlayer
+
+# package managers (this repo uses bun)
+package-lock.json
+yarn.lock
+
+# local database (Turso/libSQL in production)
+prisma/dev.db
+prisma/dev.db-journal
+
 # Podman
 podman volumes/
 /dist/

@@ -19,11 +19,11 @@
       "command": "npx",
       "args": [
         "-y",
-        "@upstash/context7-mcp",
-        "--api-key",
-        "ctx7sk-12e8ea67-0ee3-4358-bbf5-b12ef2c9e41c"
+        "@upstash/context7-mcp"
       ],
-      "env": {}
+      "env": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
+      }
     },
     "chrome-devtools": {
       "type": "stdio",

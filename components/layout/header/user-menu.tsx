@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
-import { useSession, signOut } from "@/lib/next-auth-compat";
+import { useSession, signOut } from "@/lib/auth-client";
 
 export default function UserMenu() {
   const { data: session } = useSession();

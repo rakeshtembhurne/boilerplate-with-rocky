@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { updateUserName, type FormData } from "@/actions/update-user-name";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { User } from "@prisma/client";
-import { useSession } from "@/lib/next-auth-compat";
+import { useSession } from "@/lib/auth-client";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 

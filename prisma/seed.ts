@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -115,7 +115,7 @@ async function main() {
   await prisma.product.deleteMany({});
   console.log("Cleared existing products");
 
-  const products: any[] = [];
+  const products: Prisma.ProductCreateManyInput[] = [];
 
   // Generate 50 products
   const productsToGenerate = 50;
