@@ -52,20 +52,13 @@ CREATE TABLE "Verification" (
 );
 
 -- CreateTable
-CREATE TABLE "Product" (
+CREATE TABLE "Item" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "name" TEXT NOT NULL,
     "description" TEXT,
-    "sku" TEXT,
-    "barcode" TEXT,
-    "price" REAL NOT NULL,
-    "discountedPrice" REAL,
-    "stock" INTEGER NOT NULL DEFAULT 0,
-    "category" TEXT,
-    "subCategory" TEXT,
     "status" TEXT NOT NULL DEFAULT 'DRAFT',
-    "inStock" BOOLEAN NOT NULL DEFAULT true,
-    "chargeTax" BOOLEAN NOT NULL DEFAULT false,
+    "price" REAL NOT NULL DEFAULT 0,
+    "quantity" INTEGER NOT NULL DEFAULT 0,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL
 );
@@ -84,3 +77,9 @@ CREATE INDEX "Account_userId_idx" ON "Account"("userId");
 
 -- CreateIndex
 CREATE INDEX "Verification_identifier_idx" ON "Verification"("identifier");
+
+-- CreateIndex
+CREATE INDEX "Item_createdAt_idx" ON "Item"("createdAt");
+
+-- CreateIndex
+CREATE INDEX "Item_status_idx" ON "Item"("status");

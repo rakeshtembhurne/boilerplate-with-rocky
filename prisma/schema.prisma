@@ -75,20 +75,22 @@ model Verification {
   @@index([identifier])
 }
 
-model Product {
-  id              String   @id @default(cuid())
-  name            String
-  description     String?
-  sku             String?
-  barcode         String?
-  price           Float
-  discountedPrice Float?
-  stock           Int      @default(0)
-  category        String?
-  subCategory     String?
-  status          String   @default("DRAFT")
-  inStock         Boolean  @default(true)
-  chargeTax       Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+enum ItemStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+model Item {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  status      ItemStatus @default(DRAFT)
+  price       Float      @default(0)
+  quantity    Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([createdAt])
+  @@index([status])
 }

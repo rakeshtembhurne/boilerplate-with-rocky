@@ -23,8 +23,8 @@
       "@/*": [
         "./*"
       ],
-      "@/products/*": [
-        "./app/(protected)/products/*"
+      "@/items/*": [
+        "./app/(protected)/items/*"
       ]
     },
     "plugins": [

@@ -92,7 +92,7 @@ export default function PricingPage() {
           </div>
           
           <nav className="flex items-center gap-6">
-            <a href="/create" className="text-sm text-muted-foreground hover:text-foreground">Create Logo</a>
+            <a href="/auth/sign-up" className="text-sm text-muted-foreground hover:text-foreground">Get started</a>
             <a href="/pricing" className="text-sm font-medium text-violet-600">Pricing</a>
           </nav>
 
