@@ -11,10 +11,15 @@ Flow, plugins, database, theming, commands).
 - **Database:** Prisma 7 + Turso/libSQL. Import the client from
   `@/prisma/generated/client`; use `@/lib/db` for the singleton. After changing
   `prisma/schema.prisma`, run `bun run db:migrate` (generates + migrates).
-- **Auth:** better-auth (`lib/auth.ts`). Enforce authorization server-side, not
-  in the proxy.
+- **Auth:** better-auth (`lib/auth.ts`). Supports password, email OTP, and
+  Google sign-in. For local OTP testing, set `EMAIL_OTP_TEST_CODE`; never use
+  a fixed code in production. Enforce authorization server-side, not in the
+  proxy.
 - **Themes:** edit `styles/themes.css`, then `bun run themes:generate`.
-- **Verify before done:** `bun run lint && bun run type-check && bun run build`.
+- **Verify before done:** `bun test && bun run lint && bun run type-check && bun run build && bun run themes:check`.
+- **Git Flow:** branch features from `develop`; merge with `--no-ff`; delete
+  feature branches after merging. Create release tags on `main`, never on
+  `develop`.
 
 ## Definition of done
 
@@ -22,3 +27,5 @@ Flow, plugins, database, theming, commands).
 2. `bun run type-check` — clean
 3. `bun run build` — succeeds
 4. Changes committed with a Google-style message and merged per Git Flow.
+5. Keep `README.md` and `CLAUDE.md` accurate when setup, auth, routes, or
+   release procedures change.

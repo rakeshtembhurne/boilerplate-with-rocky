@@ -9,8 +9,8 @@ type-safe environment validation, CI, and one clean plugin example to copy.
 ## Features
 
 - ⚡ **Next.js 16** App Router + Turbopack, React 19
-- 🔐 **better-auth** — email/password + Google OAuth, email verification and
-  password reset
+- 🔐 **better-auth** — email/password, email-code (OTP), and Google OAuth,
+  email verification and password reset
 - 👥 Role-based access (`ADMIN` / `USER`) with admin-only mutations
 - 🗄️ **Prisma 7** + **Turso/libSQL** via the `@prisma/adapter-libsql` driver
   adapter (local SQLite file for dev, Turso for production)
@@ -35,19 +35,36 @@ bunx --bun prisma db seed       # optional sample data
 bun run dev                     # http://localhost:3000
 ```
 
+## New contributor start here
+
+1. Read this README, then [CLAUDE.md](./CLAUDE.md) for project conventions.
+2. Copy `.env.example` to `.env.local` and fill in the required values.
+3. Use Bun for every package/runtime command; do not use npm, yarn, or npx.
+4. Run the checks before opening a pull request:
+
+```bash
+bun test && bun run lint && bun run type-check && bun run build && bun run themes:check
+```
+
+Authentication is available through **Email code**, **Password**, and **Google**
+sign-in modes. In local development, set `EMAIL_OTP_TEST_CODE` in `.env.local`
+to use a deterministic six-digit code. The helper is ignored in production;
+never commit a real OTP or rely on a fixed production code.
+
 > Bun loads `.env` files automatically, so no `dotenv` is required.
 
 ## Scripts
 
-| Script | Description |
-| --- | --- |
-| `bun run dev` | Dev server (Turbopack) |
-| `bun run build` / `bun run start` | Production build / server |
-| `bun run lint` | ESLint (flat config) |
-| `bun run type-check` | TypeScript |
-| `bun run themes:generate` / `themes:check` | Regenerate / verify theme presets |
-| `bun run db:migrate` / `db:seed` / `db:studio` / `db:push` | Database tasks |
-| `bun run podman:build` / `podman:up` / `podman:down` / `podman:logs` | Self-host stack |
+| Script                                                               | Description                       |
+| -------------------------------------------------------------------- | --------------------------------- |
+| `bun run dev`                                                        | Dev server (Turbopack)            |
+| `bun run build` / `bun run start`                                    | Production build / server         |
+| `bun test`                                                           | Bun test suite                    |
+| `bun run lint`                                                       | ESLint (flat config)              |
+| `bun run type-check`                                                 | TypeScript                        |
+| `bun run themes:generate` / `themes:check`                           | Regenerate / verify theme presets |
+| `bun run db:migrate` / `db:seed` / `db:studio` / `db:push`           | Database tasks                    |
+| `bun run podman:build` / `podman:up` / `podman:down` / `podman:logs` | Self-host stack                   |
 
 ## Database — Turso (libSQL)
 
@@ -80,15 +97,48 @@ See `.env.example`. Only `NEXT_PUBLIC_APP_URL` and `BETTER_AUTH_SECRET` are
 enforced in production; everything else is optional and validated in
 `lib/env.ts`.
 
-| Variable | Required | Notes |
-| --- | --- | --- |
-| `NEXT_PUBLIC_APP_URL` | prod | Public app URL, no trailing slash |
-| `BETTER_AUTH_SECRET` | prod | `openssl rand -base64 32` |
-| `DATABASE_URL` | yes | `file:./prisma/dev.db` or `libsql://…` |
-| `DATABASE_AUTH_TOKEN` | Turso | Turso auth token |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | no | Enables Google OAuth |
-| `RESEND_API_KEY` / `FROM_EMAIL` | no | Verification/reset emails (no-op without key) |
-| `BETTER_AUTH_TRUSTED_ORIGINS` | no | Extra comma-separated origins |
+| Variable                                    | Required   | Notes                                                                         |
+| ------------------------------------------- | ---------- | ----------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_APP_URL`                       | prod       | Public app URL, no trailing slash                                             |
+| `BETTER_AUTH_SECRET`                        | prod       | `openssl rand -base64 32`                                                     |
+| `DATABASE_URL`                              | yes        | `file:./prisma/dev.db` or `libsql://…`                                        |
+| `DATABASE_AUTH_TOKEN`                       | Turso      | Turso auth token                                                              |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | no         | Enables Google OAuth                                                          |
+| `RESEND_API_KEY` / `FROM_EMAIL`             | no         | Verification/reset emails (no-op without key)                                 |
+| `EMAIL_OTP_TEST_CODE`                       | local only | Deterministic 6-digit code for local email OTP testing; ignored in production |
+| `BETTER_AUTH_TRUSTED_ORIGINS`               | no         | Extra comma-separated origins                                                 |
+
+## Git Flow and releases
+
+This repository uses Git Flow:
+
+- `develop` is the integration branch.
+- Create `feature/*` branches from `develop` and merge them back with
+  `--no-ff`.
+- Create `release/*` branches from `develop` for release preparation.
+- `main` is production-only and receives the release merge.
+- Create the annotated SemVer tag on `main` **after** the release merge; never
+  tag `develop`.
+
+For a release:
+
+```bash
+git switch develop
+git pull --ff-only
+git switch -c release/2.0.0
+bun test && bun run lint && bun run type-check && bun run build && bun run themes:check
+git switch main
+git pull --ff-only
+git merge --no-ff release/2.0.0 -m "chore(release): release 2.0.0"
+git tag -a v2.0.0 -m "Release v2.0.0"
+git push origin main v2.0.0
+git push origin develop
+git branch -d release/2.0.0
+```
+
+Use the version in `package.json` as the release version and bump it as part of
+release preparation. For a hotfix, branch from `main`, merge it into both
+`main` and `develop`, and tag the production merge on `main`.
 
 ## Self-hosting (Docker / Podman)
 

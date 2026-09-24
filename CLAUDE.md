@@ -21,7 +21,8 @@ This repo follows Git Flow:
 - `release/*`, `hotfix/*` — as needed
 
 Rules: never commit directly to `main`; always pull `develop` before starting a
-feature; delete feature branches after merging.
+feature; delete feature branches after merging. Create annotated SemVer tags
+on `main` only, after the release merge. Never tag `develop`.
 
 ```bash
 git checkout develop && git pull
@@ -97,9 +98,28 @@ driver adapter. Config lives in `prisma.config.ts`; the client is generated to
 ## Auth (better-auth)
 
 Configured in `lib/auth.ts`; client in `lib/auth-client.ts`. Sessions are
-database-backed. `role` is exposed via `additionalFields` with `input: false`.
+database-backed. Sign-in supports email/password, email-code (OTP), and Google
+OAuth. `role` is exposed via `additionalFields` with `input: false`.
+
+For local email OTP testing, set `EMAIL_OTP_TEST_CODE` in `.env.local`; the
+helper is disabled in production and fixed OTP codes must never be used there.
 **Never** trust the proxy cookie check for authorization — enforce it inside
 server actions and route handlers (see `actions/update-user-role.ts`).
+
+## Release and tagging
+
+Use Git Flow for releases:
+
+1. Branch `release/x.y.z` from `develop` and run the full verification suite.
+2. Switch to `main`, update it with `git pull --ff-only`, and merge the release
+   branch using `--no-ff`.
+3. Create an annotated SemVer tag on the `main` merge:
+   `git tag -a v2.0.0 -m "Release v2.0.0"`.
+4. Push `main`, the tag, and `develop`; delete the release branch afterward.
+
+For a hotfix, branch from `main`, merge the fix into both `main` and `develop`,
+and tag the production merge on `main`. Keep the version in `package.json` in
+sync with the release tag.
 
 ## Theming
 
@@ -113,8 +133,10 @@ layout, light/dark. Default preset: `config/site.ts` → `siteConfig.theme.defau
 ```bash
 bun run dev            # dev server
 bun run build          # production build
+bun test               # Bun test suite
 bun run lint           # eslint (flat config)
 bun run type-check     # tsc --noEmit
+bun run themes:check  # verify generated theme registry
 bun run themes:generate
 bun run db:migrate / db:seed / db:studio / db:push
 bun run podman:build / podman:up / podman:down / podman:logs
