@@ -1,10 +1,10 @@
+import { SidebarNavItem } from "types";
+
 // Simple UserRole enum for dashboard config
 export enum UserRole {
   ADMIN = "ADMIN",
   USER = "USER",
 }
-
-import { SidebarNavItem } from "types";
 
 export const sidebarLinks: SidebarNavItem[] = [
   {
@@ -25,13 +25,6 @@ export const sidebarLinks: SidebarNavItem[] = [
         title: "Orders",
         badge: 2,
         authorizeOnly: UserRole.ADMIN,
-      },
-      {
-        href: "#/dashboard/posts",
-        icon: "post",
-        title: "User Posts",
-        authorizeOnly: UserRole.USER,
-        disabled: true,
       },
     ],
   },
