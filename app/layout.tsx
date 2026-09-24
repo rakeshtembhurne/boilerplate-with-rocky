@@ -1,18 +1,18 @@
 import "@/styles/globals.css";
 
+import { Metadata } from "next";
 import { cookies } from "next/headers";
 import { ThemeProvider } from "next-themes";
 import NextTopLoader from "nextjs-toploader";
 
+import { DEFAULT_THEME, type ThemeType } from "@/lib/themes";
 import { cn, constructMetadata } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
-import GoogleAnalyticsInit from "@/lib/ga";
-import ModalProvider from "@/components/modals/providers";
-import { TailwindIndicator } from "@/components/tailwind-indicator";
 import { ActiveThemeProvider } from "@/components/active-theme";
+import ModalProvider from "@/components/modals/providers";
+import { Analytics } from "@/components/providers/analytics";
 import { DynamicFontLoader } from "@/components/providers/dynamic-font-loader";
-import { DEFAULT_THEME, type ThemeType } from "@/lib/themes";
-import { Metadata } from "next";
+import { TailwindIndicator } from "@/components/tailwind-indicator";
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -57,8 +57,12 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           <ActiveThemeProvider initialTheme={themeSettings}>
             <DynamicFontLoader />
             <ModalProvider>{children}</ModalProvider>
-            <NextTopLoader color="var(--primary)" showSpinner={false} height={2} />
-            {process.env.NODE_ENV === "production" ? <GoogleAnalyticsInit /> : null}
+            <NextTopLoader
+              color="var(--primary)"
+              showSpinner={false}
+              height={2}
+            />
+            <Analytics />
             <Toaster position="top-center" richColors closeButton />
             <TailwindIndicator />
           </ActiveThemeProvider>

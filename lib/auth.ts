@@ -2,7 +2,11 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 
 import { prisma } from "@/lib/db";
-import { sendEmail, resetPasswordEmail, verifyEmailTemplate } from "@/lib/email";
+import {
+  resetPasswordEmail,
+  sendEmail,
+  verifyEmailTemplate,
+} from "@/lib/email";
 import { assertServerEnv, env } from "@/lib/env";
 
 assertServerEnv();
@@ -23,8 +27,8 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-    // Require verification in production only when email delivery is configured.
-    requireEmailVerification: env.NODE_ENV === "production" && !!env.RESEND_API_KEY,
+    // Off by default; enable with REQUIRE_EMAIL_VERIFICATION=true.
+    requireEmailVerification: env.REQUIRE_EMAIL_VERIFICATION === "true",
     sendResetPassword: async ({ user, url }) => {
       await sendEmail({
         to: user.email,

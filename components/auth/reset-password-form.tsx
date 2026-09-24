@@ -1,50 +1,52 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useSearchParams, useRouter } from "next/navigation"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
+import * as React from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { toast } from "sonner"
-import { Icons } from "@/components/shared/icons"
-import { authClient } from "@/lib/auth-client"
-import Link from "next/link"
+import { authClient } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Icons } from "@/components/shared/icons";
 
-const resetPasswordSchema = z.object({
-  password: z.string().min(8, {
-    message: "Password must be at least 8 characters.",
-  }),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-})
+const resetPasswordSchema = z
+  .object({
+    password: z.string().min(8, {
+      message: "Password must be at least 8 characters.",
+    }),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 export function ResetPasswordForm() {
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
-  const [token, setToken] = React.useState<string | null>(null)
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [token, setToken] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     // Get token from URL
-    const tokenParam = searchParams.get("token")
+    const tokenParam = searchParams.get("token");
     if (tokenParam) {
-      setToken(tokenParam)
+      setToken(tokenParam);
     } else {
       // Try to get token from path
-      const pathParts = window.location.pathname.split("/")
-      const pathToken = pathParts[pathParts.length - 1]
+      const pathParts = window.location.pathname.split("/");
+      const pathToken = pathParts[pathParts.length - 1];
       if (pathToken && pathToken !== "reset-password") {
-        setToken(pathToken)
+        setToken(pathToken);
       }
     }
-  }, [searchParams])
+  }, [searchParams]);
 
   const {
     register,
@@ -52,36 +54,38 @@ export function ResetPasswordForm() {
     formState: { errors },
   } = useForm<z.infer<typeof resetPasswordSchema>>({
     resolver: zodResolver(resetPasswordSchema),
-  })
+  });
 
   async function onSubmit(data: z.infer<typeof resetPasswordSchema>) {
     if (!token) {
-      toast.error("Invalid reset link")
-      return
+      toast.error("Invalid reset link");
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
       const result = await authClient.resetPassword({
         newPassword: data.password,
         token: token,
-      })
+      });
 
       if (result.data) {
         toast.success("Password reset successfully", {
-          description: "Your password has been reset. Please sign in with your new password.",
-        })
-        router.push("/sign-in")
+          description:
+            "Your password has been reset. Please sign in with your new password.",
+        });
+        router.push("/auth/sign-in");
       } else if (result.error) {
-        toast.error(result.error.message || "Failed to reset password")
+        toast.error(result.error.message || "Failed to reset password");
       }
     } catch (error) {
       toast.error("Something went wrong", {
-        description: error instanceof Error ? error.message : "Failed to reset password",
-      })
+        description:
+          error instanceof Error ? error.message : "Failed to reset password",
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -92,15 +96,15 @@ export function ResetPasswordForm() {
           <h1 className="text-2xl font-semibold tracking-tight text-red-600">
             Invalid Reset Link
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             The password reset link is invalid or has expired.
           </p>
         </div>
-        <Link href="/forgot-password" className={cn(buttonVariants())}>
+        <Link href="/auth/forgot-password" className={cn(buttonVariants())}>
           Request New Reset Link
         </Link>
       </div>
-    )
+    );
   }
 
   return (
@@ -109,7 +113,7 @@ export function ResetPasswordForm() {
         <h1 className="text-2xl font-semibold tracking-tight">
           Reset your password
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Enter your new password below.
         </p>
       </div>
@@ -156,16 +160,14 @@ export function ResetPasswordForm() {
       </form>
 
       <div className="text-center text-sm">
-        <span className="text-muted-foreground">
-          Remember your password?{" "}
-        </span>
+        <span className="text-muted-foreground">Remember your password? </span>
         <Link
-          href="/sign-in"
-          className="font-medium text-primary hover:underline"
+          href="/auth/sign-in"
+          className="text-primary font-medium hover:underline"
         >
           Sign in
         </Link>
       </div>
     </div>
-  )
+  );
 }

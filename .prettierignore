@@ -2,4 +2,6 @@ dist
 node_modules
 .next
 build
-.contentlayer
+prisma/generated
+lib/theme-presets.generated.ts
+CHANGELOG.md

@@ -8,7 +8,9 @@ import { z } from "zod";
  * production via `assertServerEnv()` from server entrypoints.
  */
 const envSchema = z.object({
-  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  NODE_ENV: z
+    .enum(["development", "test", "production"])
+    .default("development"),
 
   // Public
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
@@ -33,6 +35,7 @@ const envSchema = z.object({
   // Email
   RESEND_API_KEY: z.string().min(1).optional(),
   FROM_EMAIL: z.string().email().optional(),
+  REQUIRE_EMAIL_VERIFICATION: z.enum(["true", "false"]).optional(),
 
   // AI providers
   OPENROUTER_API_KEY: z.string().min(1).optional(),

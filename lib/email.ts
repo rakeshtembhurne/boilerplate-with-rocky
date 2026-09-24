@@ -22,10 +22,21 @@ export async function sendEmail({
     return { skipped: true as const };
   }
 
-  const { error } = await resend.emails.send({ from, to, subject, html });
-  if (error) throw new Error(error.message);
-
-  return { skipped: false as const };
+  try {
+    const { error } = await resend.emails.send({ from, to, subject, html });
+    if (error) {
+      console.error(
+        `[email] failed to send "${subject}" to ${to}:`,
+        error.message,
+      );
+      return { error: error.message };
+    }
+    return { skipped: false as const };
+  } catch (error) {
+    // Never let a mail failure break an auth flow.
+    console.error(`[email] threw sending "${subject}" to ${to}:`, error);
+    return { error: error instanceof Error ? error.message : "send failed" };
+  }
 }
 
 export function resetPasswordEmail(url: string) {
